@@ -1,0 +1,66 @@
+# @supadata/ts
+
+Official TypeScript/JavaScript SDK for the Supadata API.
+
+## Installation
+
+```bash
+npm install @supadata/js
+```
+
+## Usage
+
+```typescript
+import { Supadata, Transcript } from "@supadata/js";
+
+// Initialize the client
+const supadata = new Supadata({
+  apiKey: "YOUR_API_KEY",
+});
+
+// Get YouTube transcript
+const transcript = await supadata.youtube.transcript({
+  videoId: "VIDEO_ID",
+});
+
+// Translate YouTube transcript
+const translated = await supadata.youtube.translate({
+  videoId: "VIDEO_ID",
+  lang: "es",
+});
+
+// Scrape web content
+const webContent = await supadata.web.scrape("https://supadata.ai");
+
+// Map website URLs
+const siteMap = await supadata.web.map("https://supadata.ai");
+```
+
+## Error Handling
+
+The SDK throws `SupadataError` for API-related errors. You can catch and handle these errors as follows:
+
+```typescript
+import { SupadataError } from "@supadata/js";
+
+try {
+  const transcript = await supadata.youtube.transcript({
+    videoId: "INVALID_ID",
+  });
+} catch (error) {
+  if (error instanceof SupadataError) {
+    console.error(error.code); // e.g., 'video-not-found'
+    console.error(error.title); // Human readable error title
+    console.error(error.message); // Detailed error description
+    console.error(error.documentationUrl); // Link to error documentation
+  }
+}
+```
+
+## API Reference
+
+See the [Documentation](https://supadata.ai/documentation) for more details on all possible parameters and options.
+
+## License
+
+MIT
