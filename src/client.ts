@@ -11,17 +11,23 @@ export class BaseClient {
     endpoint: string,
     params: Record<string, unknown> | object
   ): Promise<T> {
-    const url = new URL(
-      endpoint,
-      this.config.baseUrl || "https://api.supadata.ai/v1"
-    );
+    const baseUrl = this.config.baseUrl || "https://api.supadata.ai/v1";
+    let url = `${baseUrl}${
+      endpoint.startsWith("/") ? endpoint : `/${endpoint}`
+    }`;
+
     if (params) {
+      const queryParams = new URLSearchParams();
       Object.entries(params).forEach(([key, value]) => {
-        url.searchParams.append(key, String(value));
+        if (value !== undefined && value !== null) {
+          queryParams.append(key, String(value));
+        }
       });
+      url += `?${queryParams.toString()}`;
     }
 
     const response = await fetch(url, {
+      method: "GET",
       headers: {
         "x-api-key": this.config.apiKey,
         "Content-Type": "application/json",
