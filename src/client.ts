@@ -1,4 +1,4 @@
-import { SupadataConfig, Error } from './types.js';
+import { SupadataConfig, Error } from "./types.js";
 
 export class BaseClient {
   protected config: SupadataConfig;
@@ -7,18 +7,24 @@ export class BaseClient {
     this.config = config;
   }
 
-  protected async fetch<T>(path: string, params?: Record<string, string>): Promise<T> {
-    const url = new URL(path, this.config.baseUrl || 'https://api.supadata.ai/v1');
+  async fetch<T>(
+    endpoint: string,
+    params: Record<string, unknown> | object
+  ): Promise<T> {
+    const url = new URL(
+      endpoint,
+      this.config.baseUrl || "https://api.supadata.ai/v1"
+    );
     if (params) {
       Object.entries(params).forEach(([key, value]) => {
-        url.searchParams.append(key, value);
+        url.searchParams.append(key, String(value));
       });
     }
 
     const response = await fetch(url, {
       headers: {
-        'x-api-key': this.config.apiKey,
-        'Content-Type': 'application/json',
+        "x-api-key": this.config.apiKey,
+        "Content-Type": "application/json",
       },
     });
 
@@ -34,7 +40,7 @@ export class BaseClient {
 }
 
 export class SupadataError extends Error {
-  code: Error['code'];
+  code: Error["code"];
   title: string;
   documentationUrl: string;
 

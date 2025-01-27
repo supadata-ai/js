@@ -1,5 +1,5 @@
-import { BaseClient } from '../client';
-import { Transcript, TranslatedTranscript } from '../types';
+import { BaseClient } from "../client.js";
+import { Transcript, TranslatedTranscript } from "../types.js";
 export interface TranscriptParams {
     videoId: string;
     lang?: string;

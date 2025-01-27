@@ -1,33 +1,33 @@
-"use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.SupadataError = exports.BaseClient = void 0;
-const axios_1 = __importDefault(require("axios"));
-class BaseClient {
+export class BaseClient {
+    config;
     constructor(config) {
         this.config = config;
-        this.client = axios_1.default.create({
-            baseURL: config.baseUrl || 'https://api.supadata.ai/v1',
+    }
+    async fetch(endpoint, params) {
+        const url = new URL(endpoint, this.config.baseUrl || "https://api.supadata.ai/v1");
+        if (params) {
+            Object.entries(params).forEach(([key, value]) => {
+                url.searchParams.append(key, String(value));
+            });
+        }
+        const response = await fetch(url, {
             headers: {
-                'x-api-key': config.apiKey,
-                'Content-Type': 'application/json',
+                "x-api-key": this.config.apiKey,
+                "Content-Type": "application/json",
             },
         });
-        // Add response interceptor to handle errors
-        this.client.interceptors.response.use(response => response, error => {
-            var _a;
-            if ((_a = error.response) === null || _a === void 0 ? void 0 : _a.data) {
-                const apiError = error.response.data;
-                throw new SupadataError(apiError);
-            }
-            throw error;
-        });
+        const data = await response.json();
+        if (!response.ok) {
+            const error = data;
+            throw new SupadataError(error);
+        }
+        return data;
     }
 }
-exports.BaseClient = BaseClient;
-class SupadataError extends Error {
+export class SupadataError extends Error {
+    code;
+    title;
+    documentationUrl;
     constructor(error) {
         super(error.description);
         this.code = error.code;
@@ -35,4 +35,3 @@ class SupadataError extends Error {
         this.documentationUrl = error.documentationUrl;
     }
 }
-exports.SupadataError = SupadataError;

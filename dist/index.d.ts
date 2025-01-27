@@ -1,10 +1,10 @@
-import { SupadataConfig } from './types';
-import { YouTubeService } from './services/youtube';
-import { WebService } from './services/web';
-export * from './types';
-export * from './client';
-export * from './services/youtube';
-export * from './services/web';
+import { SupadataConfig } from './types.js';
+import { YouTubeService } from './services/youtube.js';
+import { WebService } from './services/web.js';
+export * from './types.js';
+export * from './client.js';
+export * from './services/youtube.js';
+export * from './services/web.js';
 export declare class Supadata {
     readonly youtube: YouTubeService;
     readonly web: WebService;
