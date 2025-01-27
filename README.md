@@ -1,6 +1,11 @@
-# @supadata/ts
+# Supadata JS SDK
 
-Official TypeScript/JavaScript SDK for the Supadata API.
+[![NPM package](https://img.shields.io/npm/v/@supadata/js.svg?branch=main)](https://www.npmjs.com/package/@supadata/js)
+[![MIT license](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat)](http://opensource.org/licenses/MIT)
+
+The official TypeScript/JavaScript SDK for Supadata.
+
+Get your free API key at [supadata.ai](https://supadata.ai) and start scraping data in minutes.
 
 ## Installation
 
@@ -11,29 +16,29 @@ npm install @supadata/js
 ## Usage
 
 ```typescript
-import { Supadata, Transcript } from "@supadata/js";
+import { Supadata, Transcript } from '@supadata/js';
 
 // Initialize the client
 const supadata = new Supadata({
-  apiKey: "YOUR_API_KEY",
+  apiKey: 'YOUR_API_KEY',
 });
 
 // Get YouTube transcript
 const transcript = await supadata.youtube.transcript({
-  videoId: "VIDEO_ID",
+  videoId: 'VIDEO_ID',
 });
 
 // Translate YouTube transcript
 const translated = await supadata.youtube.translate({
-  videoId: "VIDEO_ID",
-  lang: "es",
+  videoId: 'VIDEO_ID',
+  lang: 'es',
 });
 
 // Scrape web content
-const webContent = await supadata.web.scrape("https://supadata.ai");
+const webContent = await supadata.web.scrape('https://supadata.ai');
 
 // Map website URLs
-const siteMap = await supadata.web.map("https://supadata.ai");
+const siteMap = await supadata.web.map('https://supadata.ai');
 ```
 
 ## Error Handling
@@ -41,11 +46,11 @@ const siteMap = await supadata.web.map("https://supadata.ai");
 The SDK throws `SupadataError` for API-related errors. You can catch and handle these errors as follows:
 
 ```typescript
-import { SupadataError } from "@supadata/js";
+import { SupadataError } from '@supadata/js';
 
 try {
   const transcript = await supadata.youtube.transcript({
-    videoId: "INVALID_ID",
+    videoId: 'INVALID_ID',
   });
 } catch (error) {
   if (error instanceof SupadataError) {
