@@ -1,4 +1,5 @@
-import { SupadataConfig, Error } from "./types.js";
+import { SupadataConfig, SupadataError } from './types.js';
+import { mapGatewayError } from './gateway-error-mapper.js';
 
 export class BaseClient {
   protected config: SupadataConfig;
@@ -11,9 +12,9 @@ export class BaseClient {
     endpoint: string,
     params: Record<string, unknown> | object
   ): Promise<T> {
-    const baseUrl = this.config.baseUrl || "https://api.supadata.ai/v1";
+    const baseUrl = this.config.baseUrl || 'https://api.supadata.ai/v1';
     let url = `${baseUrl}${
-      endpoint.startsWith("/") ? endpoint : `/${endpoint}`
+      endpoint.startsWith('/') ? endpoint : `/${endpoint}`
     }`;
 
     if (params) {
@@ -27,33 +28,41 @@ export class BaseClient {
     }
 
     const response = await fetch(url, {
-      method: "GET",
+      method: 'GET',
       headers: {
-        "x-api-key": this.config.apiKey,
-        "Content-Type": "application/json",
+        'x-api-key': this.config.apiKey,
+        'Content-Type': 'application/json',
       },
     });
 
-    const data = await response.json();
+    const contentType = response.headers.get('content-type');
 
     if (!response.ok) {
-      const error = data as Error;
-      throw new SupadataError(error);
+      if (contentType?.includes('application/json')) {
+        const errorData = await response.json();
+        throw new SupadataError(errorData);
+      } else {
+        const errorText = await response.text();
+        throw mapGatewayError(response.status, errorText);
+      }
     }
 
-    return data as T;
-  }
-}
+    try {
+      if (!contentType?.includes('application/json')) {
+        throw new SupadataError({
+          error: 'internal-error',
+          message: 'Invalid response format',
+          details: 'Expected JSON response but received different content type',
+        });
+      }
 
-export class SupadataError extends Error {
-  code: Error["code"];
-  title: string;
-  documentationUrl: string;
-
-  constructor(error: Error) {
-    super(error.description);
-    this.code = error.code;
-    this.title = error.title;
-    this.documentationUrl = error.documentationUrl;
+      return (await response.json()) as T;
+    } catch (error) {
+      throw new SupadataError({
+        error: 'internal-error',
+        message: 'Failed to parse response',
+        details: error instanceof Error ? error.message : 'Unknown error',
+      });
+    }
   }
 }

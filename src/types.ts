@@ -35,11 +35,30 @@ export interface SupadataConfig {
   baseUrl?: string;
 }
 
-export interface Error {
-  code: 'invalid-request' | 'missing-parameters' | 'internal-error' | 'transcript-unavailable' | 
-        'video-not-found' | 'video-id-invalid' | 'youtube-api-error' | 'quota-exceeded' | 
-        'rate-limit-exceeded';
-  title: string;
-  description: string;
+export class SupadataError extends Error {
+  error:
+    | 'invalid-request'
+    | 'missing-parameters'
+    | 'internal-error'
+    | 'transcript-unavailable'
+    | 'video-not-found'
+    | 'video-id-invalid'
+    | 'youtube-api-error'
+    | 'quota-exceeded'
+    | 'rate-limit-exceeded';
+  details: string;
   documentationUrl: string;
+
+  constructor(error: {
+    error: SupadataError['error'];
+    message?: string;
+    details?: string;
+    documentationUrl?: string;
+  }) {
+    super(error.message || 'An unexpected error occurred');
+    this.error = error.error || 'internal-error';
+    this.details = error.details || 'An unexpected error occurred';
+    this.documentationUrl = error.documentationUrl || '';
+    this.name = 'SupadataError';
+  }
 }

@@ -52,12 +52,12 @@ try {
   const transcript = await supadata.youtube.transcript({
     videoId: 'INVALID_ID',
   });
-} catch (error) {
-  if (error instanceof SupadataError) {
-    console.error(error.code); // e.g., 'video-not-found'
-    console.error(error.title); // Human readable error title
-    console.error(error.message); // Detailed error description
-    console.error(error.documentationUrl); // Link to error documentation
+} catch (e) {
+  if (e instanceof SupadataError) {
+    console.error(e.error); // e.g., 'video-not-found'
+    console.error(e.message); // Human readable error message
+    console.error(e.details); // Detailed error description
+    console.error(e.documentationUrl); // Link to error documentation (optional)
   }
 }
 ```
