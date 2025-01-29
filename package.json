@@ -1,19 +1,23 @@
 {
   "name": "@supadata/js",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "TypeScript / JavaScript SDK for Supadata API",
-  "type": "module",
-  "main": "./dist/index.js",
-  "module": "./dist/index.js",
+  "homepage": "https://supadata.ai",
+  "repository": "https://github.com/supadata-ai/js",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/index.js"
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.cjs",
+      "default": "./dist/index.mjs"
     }
   },
   "scripts": {
-    "build": "tsc",
+    "dev": "tsup --watch",
+    "build": "tsup",
     "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
     "prepare": "npm run build",
     "format": "prettier --write \"src/**/*.{js,ts}\"",
@@ -41,6 +45,7 @@
     "jest-fetch-mock": "^3.0.3",
     "prettier": "^3.4.2",
     "ts-jest": "^29.2.5",
-    "typescript": "^5.7.3"
+    "typescript": "^5.7.3",
+    "tsup": "^8.3.6"
   }
 }
