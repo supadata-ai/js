@@ -1,0 +1,13 @@
+{
+  "name": "supadata-example",
+  "version": "1.0.0",
+  "description": "Example usage of Supadata SDK",
+  "type": "module",
+  "scripts": {
+    "start": "tsx index.ts"
+  },
+  "dependencies": {
+    "typescript": "^5.7.3",
+    "tsx": "^4.7.1"
+  }
+}

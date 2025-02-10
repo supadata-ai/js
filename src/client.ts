@@ -8,16 +8,17 @@ export class BaseClient {
     this.config = config;
   }
 
-  async fetch<T>(
+  protected async fetch<T>(
     endpoint: string,
-    params: Record<string, unknown> | object
+    params: Record<string, any> = {},
+    method: 'GET' | 'POST' = 'GET'
   ): Promise<T> {
     const baseUrl = this.config.baseUrl || 'https://api.supadata.ai/v1';
     let url = `${baseUrl}${
       endpoint.startsWith('/') ? endpoint : `/${endpoint}`
     }`;
 
-    if (params) {
+    if (method === 'GET' && Object.keys(params).length > 0) {
       const queryParams = new URLSearchParams();
       Object.entries(params).forEach(([key, value]) => {
         if (value !== undefined && value !== null) {
@@ -27,13 +28,27 @@ export class BaseClient {
       url += `?${queryParams.toString()}`;
     }
 
-    const response = await fetch(url, {
-      method: 'GET',
+    return this.fetchUrl<T>(url, method, params);
+  }
+
+  protected async fetchUrl<T>(
+    url: string,
+    method: 'GET' | 'POST' = 'GET',
+    body?: Record<string, any>
+  ): Promise<T> {
+    const options: RequestInit = {
+      method,
       headers: {
         'x-api-key': this.config.apiKey,
         'Content-Type': 'application/json',
       },
-    });
+    };
+
+    if (method === 'POST' && body) {
+      options.body = JSON.stringify(body);
+    }
+
+    const response = await fetch(url, options);
 
     const contentType = response.headers.get('content-type');
 

@@ -16,7 +16,14 @@ npm install @supadata/js
 ## Usage
 
 ```typescript
-import { Supadata, Transcript } from '@supadata/js';
+import {
+  Supadata,
+  Transcript,
+  Scrape,
+  Map,
+  Crawl,
+  CrawlJob,
+} from '@supadata/js';
 
 // Initialize the client
 const supadata = new Supadata({
@@ -24,21 +31,30 @@ const supadata = new Supadata({
 });
 
 // Get YouTube transcript
-const transcript = await supadata.youtube.transcript({
+const transcript: Transcript = await supadata.youtube.transcript({
   videoId: 'VIDEO_ID',
 });
 
 // Translate YouTube transcript
-const translated = await supadata.youtube.translate({
+const translated: Transcript = await supadata.youtube.translate({
   videoId: 'VIDEO_ID',
   lang: 'es',
 });
 
 // Scrape web content
-const webContent = await supadata.web.scrape('https://supadata.ai');
+const webContent: Scrape = await supadata.web.scrape('https://supadata.ai');
 
 // Map website URLs
-const siteMap = await supadata.web.map('https://supadata.ai');
+const siteMap: Map = await supadata.web.map('https://supadata.ai');
+
+// Crawl website
+const crawl: Crawl = await supadata.web.crawl({
+  url: 'https://supadata.ai',
+  limit: 10,
+});
+
+// Get crawl job results
+const crawlResults: CrawlJob = await supadata.web.getCrawlResults(crawl.jobId);
 ```
 
 ## Error Handling
@@ -61,6 +77,10 @@ try {
   }
 }
 ```
+
+## Example
+
+See the [example](./example) directory for a simple example of how to use the SDK.
 
 ## API Reference
 

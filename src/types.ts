@@ -30,6 +30,21 @@ export interface Map {
   urls: string[];
 }
 
+export interface CrawlRequest {
+  url: string;
+  limit?: number;
+}
+
+export interface Crawl {
+  jobId: string;
+}
+
+export interface CrawlJob {
+  status: 'scraping' | 'completed' | 'failed' | 'cancelled';
+  pages?: Scrape[];
+  next?: string;
+}
+
 export interface SupadataConfig {
   apiKey: string;
   baseUrl?: string;
