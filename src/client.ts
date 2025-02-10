@@ -38,12 +38,23 @@ export class BaseClient {
     const contentType = response.headers.get('content-type');
 
     if (!response.ok) {
+      // First check for gateway-specific status codes
+      if ([403, 404, 429].includes(response.status)) {
+        const errorData = await response.json();
+        throw mapGatewayError(response.status, errorData.message);
+      }
+
+      // Handle standard API errors
       if (contentType?.includes('application/json')) {
         const errorData = await response.json();
         throw new SupadataError(errorData);
       } else {
-        const errorText = await response.text();
-        throw mapGatewayError(response.status, errorText);
+        // Fallback for unexpected non-JSON errors
+        throw new SupadataError({
+          error: 'internal-error',
+          message: 'Unexpected error response format',
+          details: await response.text(),
+        });
       }
     }
 

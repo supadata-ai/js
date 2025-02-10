@@ -44,8 +44,7 @@ export class SupadataError extends Error {
     | 'video-not-found'
     | 'video-id-invalid'
     | 'youtube-api-error'
-    | 'quota-exceeded'
-    | 'rate-limit-exceeded';
+    | 'limit-exceeded';
   details: string;
   documentationUrl: string;
 
