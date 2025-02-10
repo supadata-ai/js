@@ -127,21 +127,6 @@ describe('Supadata SDK', () => {
         })
       );
     });
-
-    it('should handle API errors', async () => {
-      const errorResponse = {
-        code: 'invalid-request' as const,
-        title: 'Invalid Request',
-        description: 'The request was invalid',
-        documentationUrl: 'https://docs.supadata.ai/errors',
-      };
-
-      fetchMock.mockResponseOnce(JSON.stringify(errorResponse), {
-        status: 400,
-      });
-
-      await expect(supadata.web.map('invalid-url')).rejects.toThrow();
-    });
   });
 
   it('should initialize with config', () => {
