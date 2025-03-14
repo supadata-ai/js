@@ -33,7 +33,9 @@ describe('Supadata SDK', () => {
         headers: { 'content-type': 'application/json' },
       });
 
-      const result = await supadata.youtube.transcript({ videoId: 'test-id' });
+      const result = await supadata.youtube.transcript({
+        videoId: 'test-id',
+      });
       expect(result).toEqual(mockResponse);
       expect(fetchMock).toHaveBeenCalledWith(
         'https://api.supadata.ai/v1/youtube/transcript?videoId=test-id',

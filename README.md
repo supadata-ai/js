@@ -32,12 +32,12 @@ const supadata = new Supadata({
 
 // Get YouTube transcript
 const transcript: Transcript = await supadata.youtube.transcript({
-  videoId: 'VIDEO_ID',
+  url: 'https://youtu.be/dQw4w9WgXcQ',
 });
 
 // Translate YouTube transcript
 const translated: Transcript = await supadata.youtube.translate({
-  videoId: 'VIDEO_ID',
+  videoId: 'dQw4w9WgXcQ',
   lang: 'es',
 });
 
