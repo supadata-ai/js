@@ -23,6 +23,11 @@ import {
   Map,
   Crawl,
   CrawlJob,
+  YouTubeVideo,
+  YouTubeChannel,
+  YouTubePlaylist,
+  YouTubeChannelVideos,
+  YouTubePlaylistVideos,
 } from '@supadata/js';
 
 // Initialize the client
@@ -39,6 +44,33 @@ const transcript: Transcript = await supadata.youtube.transcript({
 const translated: Transcript = await supadata.youtube.translate({
   videoId: 'dQw4w9WgXcQ',
   lang: 'es',
+});
+
+// Get YouTube video details
+const videoDetails: YouTubeVideo = await supadata.youtube.video({
+  url: 'https://youtu.be/dQw4w9WgXcQ',
+});
+
+// Get YouTube channel details
+const channelDetails: YouTubeChannel = await supadata.youtube.channel({
+  url: 'https://www.youtube.com/@RickAstleyYT',
+});
+
+// Get YouTube playlist details
+const playlistDetails: YouTubePlaylist = await supadata.youtube.playlist({
+  url: 'https://www.youtube.com/playlist?list=PL5cGwrD7cv8hK-qxPqRB25Dzs0BtLWhXz',
+});
+
+// Get YouTube channel videos
+const channelVideos: YouTubeChannelVideos = await supadata.youtube.channelVideos({
+  channelId: 'UCuAXFkgsw1L7xaCfnd5JJOw',
+  maxResults: 10,
+});
+
+// Get YouTube playlist videos
+const playlistVideos: YouTubePlaylistVideos = await supadata.youtube.playlistVideos({
+  playlistId: 'PL5cGwrD7cv8hK-qxPqRB25Dzs0BtLWhXz',
+  maxResults: 10,
 });
 
 // Scrape web content

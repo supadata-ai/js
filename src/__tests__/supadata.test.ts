@@ -5,6 +5,11 @@ import type {
   TranslatedTranscript,
   Scrape,
   Map,
+  YouTubeVideo,
+  YouTubeChannel,
+  YouTubePlaylist,
+  YouTubeChannelVideos,
+  YouTubePlaylistVideos,
 } from '../types.js';
 
 fetchMock.enableMocks();
@@ -66,6 +71,209 @@ describe('Supadata SDK', () => {
       expect(result).toEqual(mockResponse);
       expect(fetchMock).toHaveBeenCalledWith(
         'https://api.supadata.ai/v1/youtube/transcript/translate?videoId=test-id&lang=es',
+        expect.objectContaining({
+          method: 'GET',
+          headers: {
+            'x-api-key': 'test-api-key',
+            'Content-Type': 'application/json',
+          },
+        })
+      );
+    });
+
+    it('should get video details', async () => {
+      const mockResponse: YouTubeVideo = {
+        id: 'test-id',
+        title: 'Test Video',
+        description: 'This is a test video',
+        publishedAt: '2023-01-01T00:00:00Z',
+        channelId: 'channel-id',
+        channelTitle: 'Test Channel',
+        thumbnails: {
+          default: 'https://example.com/thumbnail.jpg',
+        },
+        viewCount: 1000,
+      };
+
+      fetchMock.mockResponseOnce(JSON.stringify(mockResponse), {
+        headers: { 'content-type': 'application/json' },
+      });
+
+      const result = await supadata.youtube.video({
+        videoId: 'test-id',
+      });
+      expect(result).toEqual(mockResponse);
+      expect(fetchMock).toHaveBeenCalledWith(
+        'https://api.supadata.ai/v1/youtube/video?videoId=test-id',
+        expect.objectContaining({
+          method: 'GET',
+          headers: {
+            'x-api-key': 'test-api-key',
+            'Content-Type': 'application/json',
+          },
+        })
+      );
+    });
+
+    it('should get channel details', async () => {
+      const mockResponse: YouTubeChannel = {
+        id: 'channel-id',
+        title: 'Test Channel',
+        description: 'This is a test channel',
+        publishedAt: '2023-01-01T00:00:00Z',
+        thumbnails: {
+          default: 'https://example.com/channel-thumbnail.jpg',
+        },
+        subscriberCount: 1000,
+        videoCount: 50,
+      };
+
+      fetchMock.mockResponseOnce(JSON.stringify(mockResponse), {
+        headers: { 'content-type': 'application/json' },
+      });
+
+      const result = await supadata.youtube.channel({
+        channelId: 'channel-id',
+      });
+      expect(result).toEqual(mockResponse);
+      expect(fetchMock).toHaveBeenCalledWith(
+        'https://api.supadata.ai/v1/youtube/channel?channelId=channel-id',
+        expect.objectContaining({
+          method: 'GET',
+          headers: {
+            'x-api-key': 'test-api-key',
+            'Content-Type': 'application/json',
+          },
+        })
+      );
+    });
+
+    it('should get playlist details', async () => {
+      const mockResponse: YouTubePlaylist = {
+        id: 'playlist-id',
+        title: 'Test Playlist',
+        description: 'This is a test playlist',
+        publishedAt: '2023-01-01T00:00:00Z',
+        channelId: 'channel-id',
+        channelTitle: 'Test Channel',
+        thumbnails: {
+          default: 'https://example.com/playlist-thumbnail.jpg',
+        },
+        itemCount: 10,
+      };
+
+      fetchMock.mockResponseOnce(JSON.stringify(mockResponse), {
+        headers: { 'content-type': 'application/json' },
+      });
+
+      const result = await supadata.youtube.playlist({
+        playlistId: 'playlist-id',
+      });
+      expect(result).toEqual(mockResponse);
+      expect(fetchMock).toHaveBeenCalledWith(
+        'https://api.supadata.ai/v1/youtube/playlist?playlistId=playlist-id',
+        expect.objectContaining({
+          method: 'GET',
+          headers: {
+            'x-api-key': 'test-api-key',
+            'Content-Type': 'application/json',
+          },
+        })
+      );
+    });
+
+    it('should get channel videos', async () => {
+      const mockResponse: YouTubeChannelVideos = {
+        channelId: 'channel-id',
+        videos: [
+          {
+            id: 'video-id-1',
+            title: 'Test Video 1',
+            description: 'This is test video 1',
+            publishedAt: '2023-01-01T00:00:00Z',
+            channelId: 'channel-id',
+            channelTitle: 'Test Channel',
+            thumbnails: {
+              default: 'https://example.com/thumbnail1.jpg',
+            },
+          },
+          {
+            id: 'video-id-2',
+            title: 'Test Video 2',
+            description: 'This is test video 2',
+            publishedAt: '2023-01-02T00:00:00Z',
+            channelId: 'channel-id',
+            channelTitle: 'Test Channel',
+            thumbnails: {
+              default: 'https://example.com/thumbnail2.jpg',
+            },
+          },
+        ],
+        nextPageToken: 'next-page-token',
+      };
+
+      fetchMock.mockResponseOnce(JSON.stringify(mockResponse), {
+        headers: { 'content-type': 'application/json' },
+      });
+
+      const result = await supadata.youtube.channelVideos({
+        channelId: 'channel-id',
+        maxResults: 2,
+      });
+      expect(result).toEqual(mockResponse);
+      expect(fetchMock).toHaveBeenCalledWith(
+        'https://api.supadata.ai/v1/youtube/channel/videos?channelId=channel-id&maxResults=2',
+        expect.objectContaining({
+          method: 'GET',
+          headers: {
+            'x-api-key': 'test-api-key',
+            'Content-Type': 'application/json',
+          },
+        })
+      );
+    });
+
+    it('should get playlist videos', async () => {
+      const mockResponse: YouTubePlaylistVideos = {
+        playlistId: 'playlist-id',
+        videos: [
+          {
+            id: 'video-id-1',
+            title: 'Test Video 1',
+            description: 'This is test video 1',
+            publishedAt: '2023-01-01T00:00:00Z',
+            channelId: 'channel-id',
+            channelTitle: 'Test Channel',
+            thumbnails: {
+              default: 'https://example.com/thumbnail1.jpg',
+            },
+          },
+          {
+            id: 'video-id-2',
+            title: 'Test Video 2',
+            description: 'This is test video 2',
+            publishedAt: '2023-01-02T00:00:00Z',
+            channelId: 'channel-id',
+            channelTitle: 'Test Channel',
+            thumbnails: {
+              default: 'https://example.com/thumbnail2.jpg',
+            },
+          },
+        ],
+        nextPageToken: 'next-page-token',
+      };
+
+      fetchMock.mockResponseOnce(JSON.stringify(mockResponse), {
+        headers: { 'content-type': 'application/json' },
+      });
+
+      const result = await supadata.youtube.playlistVideos({
+        playlistId: 'playlist-id',
+        maxResults: 2,
+      });
+      expect(result).toEqual(mockResponse);
+      expect(fetchMock).toHaveBeenCalledWith(
+        'https://api.supadata.ai/v1/youtube/playlist/videos?playlistId=playlist-id&maxResults=2',
         expect.objectContaining({
           method: 'GET',
           headers: {

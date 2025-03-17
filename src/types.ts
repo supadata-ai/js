@@ -16,6 +16,75 @@ export interface TranslatedTranscript {
   lang: string;
 }
 
+export interface YouTubeVideo {
+  id: string;
+  title: string;
+  description: string;
+  publishedAt: string;
+  channelId: string;
+  channelTitle: string;
+  thumbnails: {
+    default?: string;
+    medium?: string;
+    high?: string;
+    standard?: string;
+    maxres?: string;
+  };
+  tags?: string[];
+  categoryId?: string;
+  duration?: string;
+  viewCount?: number;
+  likeCount?: number;
+  commentCount?: number;
+}
+
+export interface YouTubeChannel {
+  id: string;
+  title: string;
+  description: string;
+  publishedAt: string;
+  thumbnails: {
+    default?: string;
+    medium?: string;
+    high?: string;
+    standard?: string;
+    maxres?: string;
+  };
+  subscriberCount?: number;
+  videoCount?: number;
+  viewCount?: number;
+  country?: string;
+}
+
+export interface YouTubePlaylist {
+  id: string;
+  title: string;
+  description: string;
+  publishedAt: string;
+  channelId: string;
+  channelTitle: string;
+  thumbnails: {
+    default?: string;
+    medium?: string;
+    high?: string;
+    standard?: string;
+    maxres?: string;
+  };
+  itemCount?: number;
+}
+
+export interface YouTubeChannelVideos {
+  channelId: string;
+  videos: YouTubeVideo[];
+  nextPageToken?: string;
+}
+
+export interface YouTubePlaylistVideos {
+  playlistId: string;
+  videos: YouTubeVideo[];
+  nextPageToken?: string;
+}
+
 export interface Scrape {
   url: string;
   content: string;
