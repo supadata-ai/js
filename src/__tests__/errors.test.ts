@@ -96,7 +96,7 @@ describe('Error Handling', () => {
       });
 
       await expect(
-        supadata.youtube.transcript({ videoId: 'invalid-id' })
+        supadata.youtube.transcript({ id: 'invalid-id' })
       ).rejects.toMatchObject(errorResponse);
     });
 
@@ -108,7 +108,7 @@ describe('Error Handling', () => {
       });
 
       await expect(
-        supadata.youtube.transcript({ videoId: 'test-id' })
+        supadata.youtube.transcript({ id: 'test-id' })
       ).rejects.toMatchObject({
         error: 'internal-error',
         message: 'Unexpected error response format',
@@ -123,7 +123,7 @@ describe('Error Handling', () => {
       });
 
       await expect(
-        supadata.youtube.transcript({ videoId: 'test-id' })
+        supadata.youtube.transcript({ id: 'test-id' })
       ).rejects.toMatchObject({
         error: 'internal-error',
         message: 'Failed to parse response',
@@ -137,7 +137,7 @@ describe('Error Handling', () => {
       });
 
       await expect(
-        supadata.youtube.transcript({ videoId: 'test-id' })
+        supadata.youtube.transcript({ id: 'test-id' })
       ).rejects.toMatchObject({
         error: 'internal-error',
         details: 'Invalid response format',
@@ -167,6 +167,36 @@ describe('Error Handling', () => {
       const error = new SupadataError(errorData);
       expect(error).toMatchObject(errorData);
       expect(error.name).toBe('SupadataError');
+    });
+  });
+
+  describe('Parameter Validation', () => {
+    it('should throw error when both id and url are provided for video.get', async () => {
+      const params = { id: 'test-id', url: 'https://youtube.com/watch?v=test-id' } as any;
+      await expect(
+        supadata.youtube.video.get(params)
+      ).rejects.toThrow("Please specify either 'id' or 'url', but not both.");
+    });
+
+    it('should throw error when neither id nor url are provided for video.get', async () => {
+      const params = {} as any;
+      await expect(
+        supadata.youtube.video.get(params)
+      ).rejects.toThrow("Please specify either 'id' or 'url', but not both.");
+    });
+
+    it('should throw error when both id and url are provided for channel.get', async () => {
+      const params = { id: 'test-id', url: 'https://youtube.com/channel/test-id' } as any;
+      await expect(
+        supadata.youtube.channel.get(params)
+      ).rejects.toThrow("Please specify either 'id' or 'url', but not both.");
+    });
+
+    it('should throw error when both id and url are provided for transcript', async () => {
+      const params = { id: 'test-id', url: 'https://youtube.com/watch?v=test-id' } as any;
+      await expect(
+        supadata.youtube.transcript(params)
+      ).rejects.toThrow("Please specify either 'id' or 'url', but not both.");
     });
   });
 });

@@ -21,10 +21,10 @@ type ExactlyOne<T, Keys extends keyof T> = {
 }[Keys] &
   Omit<T, Keys>;
 
-export type VideoIdParam = {
+export type VideoIdParam = ExactlyOne<{
   id?: string;
   url?: string;
-};
+}, 'id' | 'url'>;
 
 export type TranscriptParams = {
   lang?: string;
@@ -71,6 +71,9 @@ class VideoService extends BaseClient {
    * @returns A promise that resolves to the video details
    */
   async get(params: VideoParams): Promise<YouTubeVideo> {
+    if ((!params.id && !params.url) || (params.id && params.url)) {
+      throw new Error("Please specify either 'id' or 'url', but not both.");
+    }
     return this.fetch<YouTubeVideo>('/youtube/video', params);
   }
 }
@@ -90,6 +93,9 @@ class ChannelService extends BaseClient {
    * @returns A promise that resolves to the channel details
    */
   async get(params: ChannelParams): Promise<YouTubeChannel> {
+    if ((!params.id && !params.url) || (params.id && params.url)) {
+      throw new Error("Please specify either 'id' or 'url', but not both.");
+    }
     return this.fetch<YouTubeChannel>('/youtube/channel', params);
   }
 
@@ -103,6 +109,9 @@ class ChannelService extends BaseClient {
    * @returns A promise that resolves to an object containing an array of video IDs
    */
   async videos(params: ChannelVideosParams): Promise<YouTubeChannelVideos> {
+    if ((!params.id && !params.url) || (params.id && params.url)) {
+      throw new Error("Please specify either 'id' or 'url', but not both.");
+    }
     return this.fetch<YouTubeChannelVideos>('/youtube/channel/videos', params);
   }
 }
@@ -122,6 +131,9 @@ class PlaylistService extends BaseClient {
    * @returns A promise that resolves to the playlist details
    */
   async get(params: PlaylistParams): Promise<YouTubePlaylist> {
+    if ((!params.id && !params.url) || (params.id && params.url)) {
+      throw new Error("Please specify either 'id' or 'url', but not both.");
+    }
     return this.fetch<YouTubePlaylist>('/youtube/playlist', params);
   }
 
@@ -135,6 +147,9 @@ class PlaylistService extends BaseClient {
    * @returns A promise that resolves to an object containing an array of video IDs
    */
   async videos(params: PlaylistVideosParams): Promise<YouTubePlaylistVideos> {
+    if ((!params.id && !params.url) || (params.id && params.url)) {
+      throw new Error("Please specify either 'id' or 'url', but not both.");
+    }
     return this.fetch<YouTubePlaylistVideos>('/youtube/playlist/videos', params);
   }
 }
@@ -170,6 +185,9 @@ export class YouTubeService extends BaseClient {
    * @returns A promise that resolves to the video transcript
    */
   async transcript(params: TranscriptParams): Promise<Transcript> {
+    if ((!params.id && !params.url) || (params.id && params.url)) {
+      throw new Error("Please specify either 'id' or 'url', but not both.");
+    }
     return this.fetch<Transcript>('/youtube/transcript', params);
   }
 
@@ -188,6 +206,9 @@ export class YouTubeService extends BaseClient {
    * @returns A promise that resolves to the translated transcript
    */
   async translate(params: TranslateParams): Promise<TranslatedTranscript> {
+    if ((!params.id && !params.url) || (params.id && params.url)) {
+      throw new Error("Please specify either 'id' or 'url', but not both.");
+    }
     return this.fetch<TranslatedTranscript>(
       '/youtube/transcript/translation',
       params
