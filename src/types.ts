@@ -40,16 +40,18 @@ export interface YouTubeVideo {
 
 export interface YouTubeChannel {
   id: string;
-  title: string;
+  name: string;
   description: string;
-  publishedAt: string;
-  thumbnails: {
+  publishedAt?: string;
+  thumbnails?: {
     default?: string;
     medium?: string;
     high?: string;
     standard?: string;
     maxres?: string;
   };
+  thumbnail?: string;
+  banner?: string;
   subscriberCount?: number;
   videoCount?: number;
   viewCount?: number;
@@ -60,29 +62,21 @@ export interface YouTubePlaylist {
   id: string;
   title: string;
   description: string;
-  publishedAt: string;
-  channelId: string;
-  channelTitle: string;
-  thumbnails: {
-    default?: string;
-    medium?: string;
-    high?: string;
-    standard?: string;
-    maxres?: string;
+  videoCount?: number;
+  viewCount?: number;
+  lastUpdated?: string;
+  channel?: {
+    id: string;
+    name: string;
   };
-  itemCount?: number;
 }
 
 export interface YouTubeChannelVideos {
-  channelId: string;
-  videos: YouTubeVideo[];
-  nextPageToken?: string;
+  videoIds: string[];
 }
 
 export interface YouTubePlaylistVideos {
-  playlistId: string;
-  videos: YouTubeVideo[];
-  nextPageToken?: string;
+  videoIds: string[];
 }
 
 export interface Scrape {
