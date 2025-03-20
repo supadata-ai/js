@@ -1,5 +1,12 @@
 import { BaseClient } from '../client.js';
-import { Transcript, TranslatedTranscript } from '../types.js';
+import {
+  Transcript,
+  TranslatedTranscript,
+  YoutubeVideo,
+  YoutubeChannel,
+  YoutubePlaylist,
+  YoutubeVideoList,
+} from '../types.js';
 
 /**
  * Ensures exactly one property from the specified keys is provided.
@@ -22,6 +29,15 @@ export interface TranslateParams extends Omit<TranscriptParams, 'lang'> {
 }
 
 export class YouTubeService extends BaseClient {
+  private _channel: YouTubeService.Channel;
+  private _playlist: YouTubeService.Playlist;
+
+  constructor(config: any) {
+    super(config);
+    this._channel = new YouTubeService.Channel(config);
+    this._playlist = new YouTubeService.Playlist(config);
+  }
+
   /**
    * Fetches a transcript for a YouTube video.
    *
@@ -51,5 +67,93 @@ export class YouTubeService extends BaseClient {
       '/youtube/transcript/translate',
       params
     );
+  }
+
+  /**
+   * Fetches details for a YouTube video.
+   *
+   * @param id - The YouTube video ID
+   * @returns A promise that resolves to the video details
+   */
+  async video(id: string): Promise<YoutubeVideo> {
+    return this.fetch<YoutubeVideo>('/youtube/video', { id });
+  }
+
+  /**
+   * Access channel-related operations
+   */
+  get channel(): YouTubeService.Channel {
+    return this._channel;
+  }
+
+  /**
+   * Access playlist-related operations
+   */
+  get playlist(): YouTubeService.Playlist {
+    return this._playlist;
+  }
+}
+
+export namespace YouTubeService {
+  export class Channel extends BaseClient {
+    /**
+     * Fetches details for a YouTube channel.
+     *
+     * @param id - The YouTube channel ID
+     * @returns A promise that resolves to the channel details
+     */
+    async get(id: string): Promise<YoutubeChannel> {
+      return this.fetch<YoutubeChannel>('/youtube/channel', { id });
+    }
+
+    /**
+     * Fetches video IDs from a YouTube channel.
+     *
+     * @param id - The YouTube channel ID
+     * @param limit - Optional limit on the number of video IDs to return (max 5000)
+     * @returns A promise that resolves to the list of video IDs
+     */
+    async videos(id: string, limit?: number): Promise<string[]> {
+      if (limit !== undefined && (limit <= 0 || limit > 5000)) {
+        throw new Error('Limit must be between 1 and 5000');
+      }
+      const params: Record<string, any> = { id };
+      if (limit !== undefined) {
+        params.limit = limit;
+      }
+      const response = await this.fetch<YoutubeVideoList>('/youtube/channel/videos', params);
+      return response.videoIds;
+    }
+  }
+
+  export class Playlist extends BaseClient {
+    /**
+     * Fetches details for a YouTube playlist.
+     *
+     * @param id - The YouTube playlist ID
+     * @returns A promise that resolves to the playlist details
+     */
+    async get(id: string): Promise<YoutubePlaylist> {
+      return this.fetch<YoutubePlaylist>('/youtube/playlist', { id });
+    }
+
+    /**
+     * Fetches video IDs from a YouTube playlist.
+     *
+     * @param id - The YouTube playlist ID
+     * @param limit - Optional limit on the number of video IDs to return (max 5000)
+     * @returns A promise that resolves to the list of video IDs
+     */
+    async videos(id: string, limit?: number): Promise<string[]> {
+      if (limit !== undefined && (limit <= 0 || limit > 5000)) {
+        throw new Error('Limit must be between 1 and 5000');
+      }
+      const params: Record<string, any> = { id };
+      if (limit !== undefined) {
+        params.limit = limit;
+      }
+      const response = await this.fetch<YoutubeVideoList>('/youtube/playlist/videos', params);
+      return response.videoIds;
+    }
   }
 }

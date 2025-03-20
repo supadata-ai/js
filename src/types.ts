@@ -45,6 +45,50 @@ export interface CrawlJob {
   next?: string;
 }
 
+export interface YoutubeChannelBase {
+  id: string;
+  name: string;
+}
+
+export interface YoutubeVideo {
+  id: string;
+  title: string;
+  description: string;
+  duration: number;
+  channel: YoutubeChannelBase;
+  tags: string[];
+  thumbnail: string;
+  uploadedDate: string;
+  viewCount: number;
+  likeCount: number;
+  transcriptLanguages: string[];
+}
+
+export interface YoutubeChannel {
+  id: string;
+  name: string;
+  handle: string;
+  description: string;
+  subscriberCount: number;
+  videoCount: number;
+  thumbnail: string;
+  banner: string;
+}
+
+export interface YoutubePlaylist {
+  id: string;
+  title: string;
+  videoCount: number;
+  viewCount: number;
+  lastUpdated: string;
+  channel: YoutubeChannelBase;
+  description?: string;
+}
+
+export interface YoutubeVideoList {
+  videoIds: string[];
+}
+
 export interface SupadataConfig {
   apiKey: string;
   baseUrl?: string;

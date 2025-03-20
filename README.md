@@ -23,6 +23,9 @@ import {
   Map,
   Crawl,
   CrawlJob,
+  YoutubeVideo,
+  YoutubeChannel,
+  YoutubePlaylist,
 } from '@supadata/js';
 
 // Initialize the client
@@ -40,6 +43,21 @@ const translated: Transcript = await supadata.youtube.translate({
   videoId: 'dQw4w9WgXcQ',
   lang: 'es',
 });
+
+// Get YouTube video details
+const video: YoutubeVideo = await supadata.youtube.video('dQw4w9WgXcQ');
+
+// Get YouTube channel details
+const channel: YoutubeChannel = await supadata.youtube.channel.get('CHANNEL_ID');
+
+// Get YouTube playlist details
+const playlist: YoutubePlaylist = await supadata.youtube.playlist.get('PLAYLIST_ID');
+
+// Get channel videos (with optional limit)
+const channelVideos: string[] = await supadata.youtube.channel.videos('CHANNEL_ID', 10);
+
+// Get playlist videos (with optional limit)
+const playlistVideos: string[] = await supadata.youtube.playlist.videos('PLAYLIST_ID', 10);
 
 // Scrape web content
 const webContent: Scrape = await supadata.web.scrape('https://supadata.ai');

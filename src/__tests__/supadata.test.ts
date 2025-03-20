@@ -5,6 +5,9 @@ import type {
   TranslatedTranscript,
   Scrape,
   Map,
+  YoutubeVideo,
+  YoutubeChannel,
+  YoutubePlaylist,
 } from '../types.js';
 
 fetchMock.enableMocks();
@@ -74,6 +77,223 @@ describe('Supadata SDK', () => {
           },
         })
       );
+    });
+
+    describe('video', () => {
+      it('should fetch video details', async () => {
+        const mockResponse: YoutubeVideo = {
+          id: 'test-video-id',
+          title: 'Test Video',
+          description: 'Test Description',
+          duration: 120,
+          channel: {
+            id: 'test-channel-id',
+            name: 'Test Channel',
+          },
+          tags: ['test', 'video'],
+          thumbnail: 'https://example.com/thumbnail.jpg',
+          uploadedDate: '2024-03-20T00:00:00Z',
+          viewCount: 1000,
+          likeCount: 100,
+          transcriptLanguages: ['en'],
+        };
+
+        fetchMock.mockResponseOnce(JSON.stringify(mockResponse), {
+          headers: { 'content-type': 'application/json' },
+        });
+
+        const result = await supadata.youtube.video('test-video-id');
+
+        expect(result).toEqual(mockResponse);
+        expect(fetchMock).toHaveBeenCalledWith(
+          expect.stringContaining('/youtube/video?id=test-video-id'),
+          expect.objectContaining({
+            method: 'GET',
+            headers: {
+              'x-api-key': 'test-api-key',
+              'Content-Type': 'application/json',
+            },
+          })
+        );
+      });
+    });
+
+    describe('channel', () => {
+      it('should fetch channel details', async () => {
+        const mockResponse: YoutubeChannel = {
+          id: 'test-channel-id',
+          name: 'Test Channel',
+          handle: '@testchannel',
+          description: 'Test Description',
+          subscriberCount: 1000,
+          videoCount: 100,
+          thumbnail: 'https://example.com/thumbnail.jpg',
+          banner: 'https://example.com/banner.jpg',
+        };
+
+        fetchMock.mockResponseOnce(JSON.stringify(mockResponse), {
+          headers: { 'content-type': 'application/json' },
+        });
+
+        const result = await supadata.youtube.channel.get('test-channel-id');
+
+        expect(result).toEqual(mockResponse);
+        expect(fetchMock).toHaveBeenCalledWith(
+          expect.stringContaining('/youtube/channel?id=test-channel-id'),
+          expect.objectContaining({
+            method: 'GET',
+            headers: {
+              'x-api-key': 'test-api-key',
+              'Content-Type': 'application/json',
+            },
+          })
+        );
+      });
+
+      describe('videos', () => {
+        it('should fetch channel video IDs', async () => {
+          const mockResponse = {
+            videoIds: ['video1', 'video2', 'video3'],
+          };
+
+          fetchMock.mockResponseOnce(JSON.stringify(mockResponse), {
+            headers: { 'content-type': 'application/json' },
+          });
+
+          const result = await supadata.youtube.channel.videos('test-channel-id');
+
+          expect(result).toEqual(mockResponse.videoIds);
+          expect(fetchMock).toHaveBeenCalledWith(
+            expect.stringContaining('/youtube/channel/videos?id=test-channel-id'),
+            expect.objectContaining({
+              method: 'GET',
+              headers: {
+                'x-api-key': 'test-api-key',
+                'Content-Type': 'application/json',
+              },
+            })
+          );
+        });
+
+        it('should handle limit parameter', async () => {
+          const mockResponse = {
+            videoIds: ['video1', 'video2'],
+          };
+
+          fetchMock.mockResponseOnce(JSON.stringify(mockResponse), {
+            headers: { 'content-type': 'application/json' },
+          });
+
+          const result = await supadata.youtube.channel.videos('test-channel-id', 2);
+
+          expect(result).toEqual(mockResponse.videoIds);
+          expect(fetchMock).toHaveBeenCalledWith(
+            expect.stringContaining('/youtube/channel/videos?id=test-channel-id&limit=2'),
+            expect.objectContaining({
+              method: 'GET',
+              headers: {
+                'x-api-key': 'test-api-key',
+                'Content-Type': 'application/json',
+              },
+            })
+          );
+        });
+
+        it('should throw error for invalid limit', async () => {
+          await expect(supadata.youtube.channel.videos('test-channel-id', 0)).rejects.toThrow();
+          await expect(supadata.youtube.channel.videos('test-channel-id', 5001)).rejects.toThrow();
+        });
+      });
+    });
+
+    describe('playlist', () => {
+      it('should fetch playlist details', async () => {
+        const mockResponse: YoutubePlaylist = {
+          id: 'test-playlist-id',
+          title: 'Test Playlist',
+          videoCount: 10,
+          viewCount: 1000,
+          lastUpdated: '2024-03-20T00:00:00Z',
+          channel: {
+            id: 'test-channel-id',
+            name: 'Test Channel',
+          },
+          description: 'Test Description',
+        };
+
+        fetchMock.mockResponseOnce(JSON.stringify(mockResponse), {
+          headers: { 'content-type': 'application/json' },
+        });
+
+        const result = await supadata.youtube.playlist.get('test-playlist-id');
+
+        expect(result).toEqual(mockResponse);
+        expect(fetchMock).toHaveBeenCalledWith(
+          expect.stringContaining('/youtube/playlist?id=test-playlist-id'),
+          expect.objectContaining({
+            method: 'GET',
+            headers: {
+              'x-api-key': 'test-api-key',
+              'Content-Type': 'application/json',
+            },
+          })
+        );
+      });
+
+      describe('videos', () => {
+        it('should fetch playlist video IDs', async () => {
+          const mockResponse = {
+            videoIds: ['video1', 'video2', 'video3'],
+          };
+
+          fetchMock.mockResponseOnce(JSON.stringify(mockResponse), {
+            headers: { 'content-type': 'application/json' },
+          });
+
+          const result = await supadata.youtube.playlist.videos('test-playlist-id');
+
+          expect(result).toEqual(mockResponse.videoIds);
+          expect(fetchMock).toHaveBeenCalledWith(
+            expect.stringContaining('/youtube/playlist/videos?id=test-playlist-id'),
+            expect.objectContaining({
+              method: 'GET',
+              headers: {
+                'x-api-key': 'test-api-key',
+                'Content-Type': 'application/json',
+              },
+            })
+          );
+        });
+
+        it('should handle limit parameter', async () => {
+          const mockResponse = {
+            videoIds: ['video1', 'video2'],
+          };
+
+          fetchMock.mockResponseOnce(JSON.stringify(mockResponse), {
+            headers: { 'content-type': 'application/json' },
+          });
+
+          const result = await supadata.youtube.playlist.videos('test-playlist-id', 2);
+
+          expect(result).toEqual(mockResponse.videoIds);
+          expect(fetchMock).toHaveBeenCalledWith(
+            expect.stringContaining('/youtube/playlist/videos?id=test-playlist-id&limit=2'),
+            expect.objectContaining({
+              method: 'GET',
+              headers: {
+                'x-api-key': 'test-api-key',
+                'Content-Type': 'application/json',
+              },
+            })
+          );
+        });
+
+        it('should throw error for invalid limit', async () => {
+          await expect(supadata.youtube.playlist.videos('test-playlist-id', 0)).rejects.toThrow();
+          await expect(supadata.youtube.playlist.videos('test-playlist-id', 5001)).rejects.toThrow();
+        });
+      });
     });
   });
 
