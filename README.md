@@ -17,12 +17,15 @@ npm install @supadata/js
 
 ```typescript
 import {
-  Supadata,
-  Transcript,
-  Scrape,
-  Map,
   Crawl,
   CrawlJob,
+  Map,
+  Scrape,
+  Supadata,
+  Transcript,
+  YoutubeChannel,
+  YoutubePlaylist,
+  YoutubeVideo,
 } from '@supadata/js';
 
 // Initialize the client
@@ -39,6 +42,31 @@ const transcript: Transcript = await supadata.youtube.transcript({
 const translated: Transcript = await supadata.youtube.translate({
   videoId: 'dQw4w9WgXcQ',
   lang: 'es',
+});
+
+// Get a YouTube Video metadata
+const video: YoutubeVideo = await supadata.youtube.video({
+  id: 'dQw4w9WgXcQ', // can be url or video id
+});
+
+// Get a YouTube channel metadata
+const channel: YoutubeChannel = await supadata.youtube.channel({
+  id: 'https://youtube.com/@RickAstleyVEVO', // can be url, channel id, handle
+});
+
+// Get a list of video IDs from a YouTube channel
+const channelVideos: string[] = await supadata.youtube.channel.videos({
+  id: 'https://youtube.com/@RickAstleyVEVO', // can be url, channel id, handle
+});
+
+// Get the metadata of a YouTube playlist
+const playlist: YoutubePlaylist = await supadata.youtube.playlist({
+  id: 'PLFgquLnL59alCl_2TQvOiD5Vgm1hCaGSI', // can be url or playlist id
+});
+
+// Get a list of video IDs from a YouTube playlist
+const playlistVideos: string[] = await supadata.youtube.playlist.videos({
+  id: 'https://www.youtube.com/playlist?list=PLlaN88a7y2_plecYoJxvRFTLHVbIVAOoc', // can be url or playlist id
 });
 
 // Scrape web content

@@ -1,5 +1,12 @@
 import { BaseClient } from '../client.js';
-import { Transcript, TranslatedTranscript } from '../types.js';
+import {
+  SupadataError,
+  Transcript,
+  TranslatedTranscript,
+  YoutubeChannel,
+  YoutubePlaylist,
+  YoutubeVideo,
+} from '../types.js';
 
 /**
  * Ensures exactly one property from the specified keys is provided.
@@ -19,6 +26,18 @@ export type TranscriptParams = {
 
 export interface TranslateParams extends Omit<TranscriptParams, 'lang'> {
   lang: string;
+}
+
+export interface ResourceParams {
+  id: string;
+}
+
+export interface ChannelVideosParams extends ResourceParams {
+  limit?: number;
+}
+
+export interface PlaylistVideosParams extends ResourceParams {
+  limit?: number;
 }
 
 export class YouTubeService extends BaseClient {
@@ -51,5 +70,88 @@ export class YouTubeService extends BaseClient {
       '/youtube/transcript/translate',
       params
     );
+  }
+
+  /**
+   * Fetches a YouTube video based on the provided parameters.
+   *
+   * @param params - The parameters required to fetch the YouTube video.
+   * @param params.id - The YouTube video ID.
+   * @returns A promise that resolves to a `YoutubeVideo` object.
+   */
+  async video(params: ResourceParams): Promise<YoutubeVideo> {
+    return this.fetch<YoutubeVideo>('/youtube/video', params);
+  }
+
+  /**
+   * Fetches YouTube channel information and videos.
+   *
+   * @param params - The parameters required to fetch the YouTube channel information.
+   * @param params.id - The YouTube channel ID.
+   * @returns A promise that resolves to a `YoutubeChannel` object containing the channel information.
+   *
+   * @property videos - Fetches the videos of the YouTube channel.
+   * @param params - The parameters required to fetch the YouTube channel videos.
+   * @param params.id - The YouTube channel ID.
+   * @param params.limit - The maximum number of videos to fetch.
+   *                       Default: 30. Max: 5000.
+   * @returns A promise that resolves to an array of video IDs.
+   *
+   * @throws {SupadataError} If the limit is invalid (less than 1 or greater than 5000).
+   */
+  channel = Object.assign(
+    async (params: ResourceParams): Promise<YoutubeChannel> => {
+      return this.fetch<YoutubeChannel>('/youtube/channel', params);
+    },
+    {
+      videos: async (params: ChannelVideosParams): Promise<string[]> => {
+        // Validate the limit locally to avoid unnecessary API calls.
+        this.validateLimit(params);
+        return this.fetch<string[]>('/youtube/channel/videos', params);
+      },
+    }
+  );
+
+  /**
+   * Fetches a YouTube playlist and its videos.
+   *
+   * @param params - The parameters required to fetch the playlist.
+   * @param params.id - The YouTube playlist ID.
+   * @returns A promise that resolves to a `YoutubePlaylist` object.
+   *
+   * @property videos - Fetches the videos of a YouTube playlist.
+   * @param params - The parameters required to fetch the playlist videos.
+   * @param params.id - The YouTube playlist ID.
+   * @param params.limit - The maximum number of videos to fetch.
+   *                       Default: 30. Max: 5000.
+   * @returns A promise that resolves to an array of video IDs.
+   *
+   * @throws {SupadataError} If the limit is invalid (less than 1 or greater than 5000).
+   */
+  playlist = Object.assign(
+    async (params: ResourceParams): Promise<YoutubePlaylist> => {
+      return this.fetch<YoutubePlaylist>('/youtube/playlist', params);
+    },
+    {
+      videos: async (params: PlaylistVideosParams): Promise<string[]> => {
+        // Validate the limit locally to avoid unnecessary API calls.
+        this.validateLimit(params);
+        return this.fetch<string[]>('/youtube/playlist/videos', params);
+      },
+    }
+  );
+
+  private validateLimit(params: { limit?: number }) {
+    if (
+      params.limit != undefined &&
+      params.limit != null &&
+      (params.limit < 1 || params.limit > 5000)
+    ) {
+      throw new SupadataError({
+        error: 'invalid-request',
+        message: 'Invalid limit.',
+        details: 'The limit must be between 1 and 5000.',
+      });
+    }
   }
 }

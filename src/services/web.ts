@@ -1,5 +1,5 @@
 import { BaseClient } from '../client.js';
-import { Scrape, Map, CrawlRequest, Crawl, CrawlJob } from '../types.js';
+import { Crawl, CrawlJob, CrawlRequest, Scrape, SiteMap } from '../types.js';
 
 export class WebService extends BaseClient {
   /**
@@ -18,8 +18,8 @@ export class WebService extends BaseClient {
    * @param url - URL of the webpage to map
    * @returns A promise that resolves to a map of URLs found on the page
    */
-  async map(url: string): Promise<Map> {
-    return this.fetch<Map>('/web/map', { url });
+  async map(url: string): Promise<SiteMap> {
+    return this.fetch<SiteMap>('/web/map', { url });
   }
 
   /**

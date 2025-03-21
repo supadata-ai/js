@@ -26,7 +26,7 @@ export interface Scrape {
   urls: string[];
 }
 
-export interface Map {
+export interface SiteMap {
   urls: string[];
 }
 
@@ -75,4 +75,42 @@ export class SupadataError extends Error {
     this.documentationUrl = error.documentationUrl || '';
     this.name = 'SupadataError';
   }
+}
+
+export interface YoutubeVideo {
+  id: string;
+  title: string;
+  description: string;
+  duration: number;
+  channel: {
+    id: string;
+    name: string;
+  };
+  tags: string[];
+  thumbnail: string;
+  uploadDate: string;
+  viewCount: number;
+  likeCount: number;
+  transcriptLanguages: string[];
+}
+
+export interface YoutubeChannel {
+  id: string;
+  name: string;
+  handle: string;
+  description: string;
+  subscriberCount: number;
+  videoCount: number;
+  thumbnail: string;
+  banner: string;
+}
+
+export interface YoutubePlaylist {
+  id: string;
+  title: string;
+  videoCount: number;
+  viewCount: number;
+  lastUpdated: string;
+  description: string;
+  thumbnail: string;
 }
