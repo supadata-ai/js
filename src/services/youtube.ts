@@ -115,10 +115,6 @@ export class YouTubeService extends BaseClient {
 
 export namespace YouTubeService {
   export class Channel extends BaseClient {
-    constructor(config: SupadataConfig) {
-      super(config);
-    }
-
     /**
      * Fetches details for a YouTube channel.
      *
@@ -135,10 +131,16 @@ export namespace YouTubeService {
      * @param id - The YouTube channel ID
      * @param limit - Optional limit on the number of video IDs to return (max 5000)
      * @returns A promise that resolves to the list of video IDs
+     * @throws {SupadataError} When limit is invalid
      */
     async videos(id: string, limit?: number): Promise<string[]> {
       if (limit !== undefined && (limit <= 0 || limit > 5000)) {
-        throw new Error('Limit must be between 1 and 5000');
+        throw new SupadataError({
+          error: 'limit-exceeded',
+          message: 'Invalid limit parameter',
+          details: 'Limit must be between 1 and 5000',
+          documentationUrl: 'https://supadata.ai/documentation/youtube/errors'
+        });
       }
       const params: Record<string, any> = { id };
       if (limit !== undefined) {
@@ -150,10 +152,6 @@ export namespace YouTubeService {
   }
 
   export class Playlist extends BaseClient {
-    constructor(config: SupadataConfig) {
-      super(config);
-    }
-
     /**
      * Fetches details for a YouTube playlist.
      *
@@ -170,10 +168,16 @@ export namespace YouTubeService {
      * @param id - The YouTube playlist ID
      * @param limit - Optional limit on the number of video IDs to return (max 5000)
      * @returns A promise that resolves to the list of video IDs
+     * @throws {SupadataError} When limit is invalid
      */
     async videos(id: string, limit?: number): Promise<string[]> {
       if (limit !== undefined && (limit <= 0 || limit > 5000)) {
-        throw new Error('Limit must be between 1 and 5000');
+        throw new SupadataError({
+          error: 'limit-exceeded',
+          message: 'Invalid limit parameter',
+          details: 'Limit must be between 1 and 5000',
+          documentationUrl: 'https://supadata.ai/documentation/youtube/errors'
+        });
       }
       const params: Record<string, any> = { id };
       if (limit !== undefined) {
