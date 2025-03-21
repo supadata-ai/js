@@ -28,19 +28,15 @@ export interface TranslateParams extends Omit<TranscriptParams, 'lang'> {
   lang: string;
 }
 
-export interface VideoParams {
+export interface ResourceParams {
   id: string;
 }
 
-export interface ChannelParams extends VideoParams {}
-
-export interface ChannelVideosParams extends ChannelParams {
+export interface ChannelVideosParams extends ResourceParams {
   limit?: number;
 }
 
-export interface PlaylistParams extends VideoParams {}
-
-export interface PlaylistVideosParams extends PlaylistParams {
+export interface PlaylistVideosParams extends ResourceParams {
   limit?: number;
 }
 
@@ -83,7 +79,7 @@ export class YouTubeService extends BaseClient {
    * @param params.id - The YouTube video ID.
    * @returns A promise that resolves to a `YoutubeVideo` object.
    */
-  async video(params: VideoParams): Promise<YoutubeVideo> {
+  async video(params: ResourceParams): Promise<YoutubeVideo> {
     return this.fetch<YoutubeVideo>('/youtube/video', params);
   }
 
@@ -104,7 +100,7 @@ export class YouTubeService extends BaseClient {
    * @throws {SupadataError} If the limit is invalid (less than 1 or greater than 5000).
    */
   channel = Object.assign(
-    async (params: ChannelParams): Promise<YoutubeChannel> => {
+    async (params: ResourceParams): Promise<YoutubeChannel> => {
       return this.fetch<YoutubeChannel>('/youtube/channel', params);
     },
     {
@@ -133,7 +129,7 @@ export class YouTubeService extends BaseClient {
    * @throws {SupadataError} If the limit is invalid (less than 1 or greater than 5000).
    */
   playlist = Object.assign(
-    async (params: PlaylistParams): Promise<YoutubePlaylist> => {
+    async (params: ResourceParams): Promise<YoutubePlaylist> => {
       return this.fetch<YoutubePlaylist>('/youtube/playlist', params);
     },
     {
