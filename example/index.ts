@@ -1,4 +1,4 @@
-import { Supadata } from '../dist/index.mjs';
+import { Supadata, SupadataError } from '../dist/index.mjs';
 
 // 🟡 Replace with your API key from https://supadata.ai
 const API_KEY = 'YOUR_API_KEY';
@@ -17,8 +17,18 @@ async function main() {
     });
     console.log('ℹ️ Transcript:', transcript);
 
-    // Example 2: Get YouTube video details
+    // Example 2: Get YouTube video details with error handling
     console.log('\nℹ️ Getting YouTube video details...');
+    try {
+      // This will throw an error due to invalid video ID
+      await supadata.youtube.video('');
+    } catch (error) {
+      if (error instanceof SupadataError && error.error === 'video-id-invalid') {
+        console.log('✅ Successfully caught invalid video ID error');
+      }
+    }
+
+    // Now try with a valid video ID
     const video = await supadata.youtube.video('dQw4w9WgXcQ');
     console.log('ℹ️ Video details:', video);
 
@@ -32,8 +42,16 @@ async function main() {
     const playlist = await supadata.youtube.playlist.get('PLFgquLnL59alCl_2TQvOiD5Vgm1h4gsGy'); // Example playlist
     console.log('ℹ️ Playlist details:', playlist);
 
-    // Example 5: Get channel videos
+    // Example 5: Get channel videos with limit validation
     console.log('\nℹ️ Getting channel videos...');
+    try {
+      // This will throw an error due to invalid limit
+      await supadata.youtube.channel.videos('UC38IQsAvIsxxjztdMZQtwHA', 5001);
+    } catch (error) {
+      console.log('✅ Successfully caught invalid limit error');
+    }
+
+    // Now try with a valid limit
     const channelVideos = await supadata.youtube.channel.videos('UC38IQsAvIsxxjztdMZQtwHA', 5);
     console.log('ℹ️ Channel videos:', channelVideos);
 

@@ -6,6 +6,8 @@ import {
   YoutubeChannel,
   YoutubePlaylist,
   YoutubeVideoList,
+  SupadataConfig,
+  SupadataError,
 } from '../types.js';
 
 /**
@@ -32,7 +34,7 @@ export class YouTubeService extends BaseClient {
   private _channel: YouTubeService.Channel;
   private _playlist: YouTubeService.Playlist;
 
-  constructor(config: any) {
+  constructor(config: SupadataConfig) {
     super(config);
     this._channel = new YouTubeService.Channel(config);
     this._playlist = new YouTubeService.Playlist(config);
@@ -70,12 +72,29 @@ export class YouTubeService extends BaseClient {
   }
 
   /**
+   * Validates a YouTube video ID
+   * @param id - The video ID to validate
+   * @throws {SupadataError} If the video ID is invalid
+   */
+  private validateVideoId(id: string): void {
+    if (!id || typeof id !== 'string' || id.trim().length === 0) {
+      throw new SupadataError({
+        error: 'video-id-invalid',
+        message: 'Invalid video ID provided',
+        details: 'Video ID must be a non-empty string',
+      });
+    }
+  }
+
+  /**
    * Fetches details for a YouTube video.
    *
    * @param id - The YouTube video ID
    * @returns A promise that resolves to the video details
+   * @throws {SupadataError} If the video ID is invalid
    */
   async video(id: string): Promise<YoutubeVideo> {
+    this.validateVideoId(id);
     return this.fetch<YoutubeVideo>('/youtube/video', { id });
   }
 
@@ -96,6 +115,10 @@ export class YouTubeService extends BaseClient {
 
 export namespace YouTubeService {
   export class Channel extends BaseClient {
+    constructor(config: SupadataConfig) {
+      super(config);
+    }
+
     /**
      * Fetches details for a YouTube channel.
      *
@@ -127,6 +150,10 @@ export namespace YouTubeService {
   }
 
   export class Playlist extends BaseClient {
+    constructor(config: SupadataConfig) {
+      super(config);
+    }
+
     /**
      * Fetches details for a YouTube playlist.
      *
