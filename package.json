@@ -1,6 +1,6 @@
 {
   "name": "@supadata/js",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "TypeScript / JavaScript SDK for Supadata API",
   "homepage": "https://supadata.ai",
   "repository": "https://github.com/supadata-ai/js",
