@@ -1,8 +1,8 @@
 import fetchMock from 'jest-fetch-mock';
 import { Supadata } from '../index.js';
 import type {
-  Map,
   Scrape,
+  SiteMap,
   Transcript,
   TranslatedTranscript,
   YoutubeVideo,
@@ -435,7 +435,7 @@ describe('Supadata SDK', () => {
     });
 
     it('should map website', async () => {
-      const mockResponse: Map = {
+      const mockResponse: SiteMap = {
         urls: ['https://supadata.ai', 'https://supadata.ai/docs'],
       };
 

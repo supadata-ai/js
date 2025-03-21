@@ -26,7 +26,7 @@ export interface Scrape {
   urls: string[];
 }
 
-export interface Map {
+export interface SiteMap {
   urls: string[];
 }
 
@@ -85,7 +85,7 @@ export interface YoutubeVideo {
   channel: {
     id: string;
     name: string;
-  }
+  };
   tags: string[];
   thumbnail: string;
   uploadDate: string;
@@ -97,7 +97,7 @@ export interface YoutubeVideo {
 export interface YoutubeChannel {
   id: string;
   name: string;
-  handle: string
+  handle: string;
   description: string;
   subscriberCount: number;
   videoCount: number;
