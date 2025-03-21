@@ -1,10 +1,11 @@
-import { Supadata } from '../index.js';
 import fetchMock from 'jest-fetch-mock';
+import { Supadata } from '../index.js';
 import type {
+  Map,
+  Scrape,
   Transcript,
   TranslatedTranscript,
-  Scrape,
-  Map,
+  YoutubeVideo,
 } from '../types.js';
 
 fetchMock.enableMocks();
@@ -74,6 +75,332 @@ describe('Supadata SDK', () => {
           },
         })
       );
+    });
+
+    it('should get the video info', async () => {
+      const videoId = 'pEfrdAtAmqk';
+      const mockResponse: YoutubeVideo = {
+        id: videoId,
+        duration: 1002,
+        description:
+          'The programming iceberg is complete roadmap to the loved, ...',
+        title: 'God-Tier Developer Roadmap',
+        channel: { id: 'UCsBjURrPoezykLs9EqgamOA', name: 'Fireship' },
+        tags: ['#iceberg', '#learntocode', '#programming'],
+        thumbnail: 'https://i.ytimg.com/vi/pEfrdAtAmqk/maxresdefault.jpg',
+        uploadDate: '2022-08-24T00:00:00.000Z',
+        viewCount: 7388353,
+        likeCount: 262086,
+        transcriptLanguages: ['en'],
+      };
+
+      fetchMock.mockResponse(JSON.stringify(mockResponse), {
+        headers: { 'content-type': 'application/json' },
+      });
+
+      const result = await supadata.youtube.video({ id: videoId });
+
+      expect(result).toEqual(mockResponse);
+      expect(fetchMock).toHaveBeenCalledWith(
+        `https://api.supadata.ai/v1/youtube/video?id=${videoId}`,
+        expect.objectContaining({
+          method: 'GET',
+          headers: {
+            'x-api-key': 'test-api-key',
+            'Content-Type': 'application/json',
+          },
+        })
+      );
+    });
+
+    it("should throw error when video doesn't exist", async () => {
+      const videoId = 'pEfrdAtmqk';
+      const mockResponse = {
+        error: 'not-found',
+        message: 'The requested item could not be found',
+      };
+
+      fetchMock.mockResponseOnce(JSON.stringify(mockResponse), {
+        status: 404,
+        headers: { 'content-type': 'application/json' },
+      });
+
+      await expect(supadata.youtube.video({ id: videoId })).rejects.toThrow(
+        'Endpoint does not exist'
+      );
+    });
+
+    it('should get the channel info', async () => {
+      const channelId = 'UCsBjURrPoezykLs9EqgamOA';
+      const mockResponse = {
+        id: channelId,
+        name: 'Fireship',
+        handle: '@Fireship',
+        description:
+          'High-intensity ⚡ code tutorials and tech news to help you ship your app faster. New videos every week covering the topics every programmer should know. ',
+        videoCount: 719,
+        subscriberCount: 3770000,
+        thumbnail:
+          'https://yt3.googleusercontent.com/ytc/AIdro_mKzklyPPhghBJQH5H3HpZ108YcE618DBRLAvRUD1AjKNw=s160-c-k-c0x00ffffff-no-rj',
+        banner:
+          'https://yt3.googleusercontent.com/62Kw34f1ysmycFceeNIFGsWpRDyqgDUSn2mAn29gwv7axMjN4NUVkJWqwEi4XKBE0016l7C4=w2560-fcrop64=1,00005a57ffffa5a8-k-c0xffffffff-no-nd-rj',
+      };
+
+      fetchMock.mockResponse(JSON.stringify(mockResponse), {
+        headers: { 'content-type': 'application/json' },
+      });
+
+      const result = await supadata.youtube.channel({ id: channelId });
+
+      expect(result).toEqual(mockResponse);
+      expect(fetchMock).toHaveBeenCalledWith(
+        `https://api.supadata.ai/v1/youtube/channel?id=${channelId}`,
+        expect.objectContaining({
+          method: 'GET',
+          headers: {
+            'x-api-key': 'test-api-key',
+            'Content-Type': 'application/json',
+          },
+        })
+      );
+    });
+
+    it("should throw error when channel doesn't exist", async () => {
+      const channelId = 'UCsBjURrPoezyLs9EqgamOA';
+      const mockResponse = {
+        error: 'not-found',
+        message: 'The requested item could not be found',
+        details: 'The requested item could not be found.',
+      };
+
+      fetchMock.mockResponseOnce(JSON.stringify(mockResponse), {
+        status: 404,
+        headers: { 'content-type': 'application/json' },
+      });
+
+      await expect(supadata.youtube.channel({ id: channelId })).rejects.toThrow(
+        'Endpoint does not exist'
+      );
+    });
+
+    it('should get a list of videos in the channel without limit', async () => {
+      const channelId = 'UCsBjURrPoezyLs9EqgamOA';
+      const mockResponse = {
+        videoIds: ['PQ2WjtaPfXU', 'UIVADiGfwWc'],
+      };
+
+      fetchMock.mockResponse(JSON.stringify(mockResponse), {
+        headers: { 'content-type': 'application/json' },
+      });
+
+      const result = await supadata.youtube.channel.videos({ id: channelId });
+
+      expect(result).toEqual(mockResponse);
+      expect(fetchMock).toHaveBeenCalledWith(
+        `https://api.supadata.ai/v1/youtube/channel/videos?id=${channelId}`,
+        expect.objectContaining({
+          method: 'GET',
+          headers: {
+            'x-api-key': 'test-api-key',
+            'Content-Type': 'application/json',
+          },
+        })
+      );
+    });
+
+    it('should get a list of videos in the channel with limit', async () => {
+      const channelId = 'UCsBjURrPoezyLs9EqgamOA';
+      const mockResponse = {
+        videoIds: ['PQ2WjtaPfXU', 'UIVADiGfwWc'],
+      };
+
+      fetchMock.mockResponse(JSON.stringify(mockResponse), {
+        headers: { 'content-type': 'application/json' },
+      });
+
+      const limit = 2;
+      const result = await supadata.youtube.channel.videos({
+        id: channelId,
+        limit: limit,
+      });
+
+      expect(result).toEqual(mockResponse);
+      expect(fetchMock).toHaveBeenCalledWith(
+        `https://api.supadata.ai/v1/youtube/channel/videos?id=${channelId}&limit=${limit}`,
+        expect.objectContaining({
+          method: 'GET',
+          headers: {
+            'x-api-key': 'test-api-key',
+            'Content-Type': 'application/json',
+          },
+        })
+      );
+    });
+
+    it("should throw error when channel doesn't exist", async () => {
+      const channelId = 'UCsBjURrPoezyLs9EqgamOA';
+      const mockResponse = {
+        error: 'not-found',
+        message: 'The requested item could not be found',
+        details: 'The requested item could not be found.',
+      };
+
+      fetchMock.mockResponseOnce(JSON.stringify(mockResponse), {
+        status: 404,
+        headers: { 'content-type': 'application/json' },
+      });
+
+      await expect(
+        supadata.youtube.channel.videos({ id: channelId })
+      ).rejects.toThrow('Endpoint does not exist');
+    });
+
+    it('should throw an error with invalid limit', async () => {
+      await expect(
+        supadata.youtube.channel.videos({ id: 'test-id', limit: 0 })
+      ).rejects.toThrow('Invalid limit.');
+
+      await expect(
+        supadata.youtube.channel.videos({ id: 'test-id', limit: -1 })
+      ).rejects.toThrow('Invalid limit.');
+
+      await expect(
+        supadata.youtube.channel.videos({ id: 'test-id', limit: 10000 })
+      ).rejects.toThrow('Invalid limit.');
+    });
+
+    it('should get the playlist info', async () => {
+      const playlistId = 'PL0vfts4VzfNjQOM9VClyL5R0LeuTxlAR3';
+      const mockResponse = {
+        id: playlistId,
+        title: 'CS101',
+        videoCount: 17,
+        viewCount: 440901,
+        lastUpdated: '2024-07-06T00:00:00.000Z',
+        channel: { id: 'UCsBjURrPoezykLs9EqgamOA', name: 'Fireship' },
+      };
+
+      fetchMock.mockResponse(JSON.stringify(mockResponse), {
+        headers: { 'content-type': 'application/json' },
+      });
+
+      const result = await supadata.youtube.playlist({ id: playlistId });
+
+      expect(result).toEqual(mockResponse);
+      expect(fetchMock).toHaveBeenCalledWith(
+        `https://api.supadata.ai/v1/youtube/playlist?id=${playlistId}`,
+        expect.objectContaining({
+          method: 'GET',
+          headers: {
+            'x-api-key': 'test-api-key',
+            'Content-Type': 'application/json',
+          },
+        })
+      );
+    });
+
+    it("should throw error when playlist doesn't exist", async () => {
+      const playlistId = 'PL0vfts4VzfNjQOM9VClyL50LeuTxlAR3';
+      const mockResponse = {
+        error: 'not-found',
+        message: 'The requested item could not be found',
+        details: 'The requested item could not be found.',
+      };
+
+      fetchMock.mockResponseOnce(JSON.stringify(mockResponse), {
+        status: 404,
+        headers: { 'content-type': 'application/json' },
+      });
+
+      await expect(
+        supadata.youtube.playlist({ id: playlistId })
+      ).rejects.toThrow('Endpoint does not exist');
+    });
+
+    it('should get a list of videos in the playlist without limit', async () => {
+      const playlistId = 'PL0vfts4VzfNjQOM9VClyL5R0LeuTxlAR3';
+      const mockResponse = {
+        videoIds: ['PQ2WjtaPfXU', 'UIVADiGfwWc'],
+      };
+
+      fetchMock.mockResponse(JSON.stringify(mockResponse), {
+        headers: { 'content-type': 'application/json' },
+      });
+
+      const result = await supadata.youtube.playlist.videos({ id: playlistId });
+
+      expect(result).toEqual(mockResponse);
+      expect(fetchMock).toHaveBeenCalledWith(
+        `https://api.supadata.ai/v1/youtube/playlist/videos?id=${playlistId}`,
+        expect.objectContaining({
+          method: 'GET',
+          headers: {
+            'x-api-key': 'test-api-key',
+            'Content-Type': 'application/json',
+          },
+        })
+      );
+    });
+
+    it('should get a list of videos in the playlist with limit', async () => {
+      const playlistId = 'PL0vfts4VzfNjQOM9VClyL5R0LeuTxlAR3';
+      const mockResponse = {
+        videoIds: ['PQ2WjtaPfXU', 'UIVADiGfwWc'],
+      };
+
+      fetchMock.mockResponse(JSON.stringify(mockResponse), {
+        headers: { 'content-type': 'application/json' },
+      });
+
+      const limit = 2;
+      const result = await supadata.youtube.playlist.videos({
+        id: playlistId,
+        limit: limit,
+      });
+
+      expect(result).toEqual(mockResponse);
+      expect(fetchMock).toHaveBeenCalledWith(
+        `https://api.supadata.ai/v1/youtube/playlist/videos?id=${playlistId}&limit=${limit}`,
+        expect.objectContaining({
+          method: 'GET',
+          headers: {
+            'x-api-key': 'test-api-key',
+            'Content-Type': 'application/json',
+          },
+        })
+      );
+    });
+
+    it("should throw error when playlist doesn't exist", async () => {
+      const playlistId = 'PL0vfts4VzfNjQOM9VClyL50LeuTxlAR3';
+      const mockResponse = {
+        error: 'not-found',
+        message: 'The requested item could not be found',
+        details: 'The requested item could not be found.',
+      };
+
+      fetchMock.mockResponseOnce(JSON.stringify(mockResponse), {
+        status: 404,
+        headers: { 'content-type': 'application/json' },
+      });
+
+      await expect(
+        supadata.youtube.playlist.videos({ id: playlistId })
+      ).rejects.toThrow('Endpoint does not exist');
+    });
+
+    it('should throw an error with invalid limit', async () => {
+      await expect(
+        supadata.youtube.playlist.videos({ id: 'test-id', limit: 0 })
+      ).rejects.toThrow('Invalid limit.');
+
+      await expect(
+        supadata.youtube.playlist.videos({ id: 'test-id', limit: -1 })
+      ).rejects.toThrow('Invalid limit.');
+
+      await expect(
+        supadata.youtube.playlist.videos({ id: 'test-id', limit: 10000 })
+      ).rejects.toThrow('Invalid limit.');
     });
   });
 
