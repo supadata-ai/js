@@ -55,8 +55,10 @@ const channel: YoutubeChannel = await supadata.youtube.channel({
 });
 
 // Get a list of video IDs from a YouTube channel
-const channelVideos: string[] = await supadata.youtube.channel.videos({
+const channelVideos: VideoIds = await supadata.youtube.channel.videos({
   id: 'https://youtube.com/@RickAstleyVEVO', // can be url, channel id, handle
+  type: 'all', // 'video', 'short', 'all'
+  limit: 10,
 });
 
 // Get the metadata of a YouTube playlist
@@ -65,8 +67,9 @@ const playlist: YoutubePlaylist = await supadata.youtube.playlist({
 });
 
 // Get a list of video IDs from a YouTube playlist
-const playlistVideos: string[] = await supadata.youtube.playlist.videos({
+const playlistVideos: VideoIds = await supadata.youtube.playlist.videos({
   id: 'https://www.youtube.com/playlist?list=PLlaN88a7y2_plecYoJxvRFTLHVbIVAOoc', // can be url or playlist id
+  limit: 10,
 });
 
 // Scrape web content

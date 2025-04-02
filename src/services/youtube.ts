@@ -34,10 +34,16 @@ export interface ResourceParams {
 
 export interface ChannelVideosParams extends ResourceParams {
   limit?: number;
+  type?: 'video' | 'short' | 'all';
 }
 
 export interface PlaylistVideosParams extends ResourceParams {
   limit?: number;
+}
+
+export interface VideoIds {
+  videoIds: string[];
+  shortIds: string[];
 }
 
 export class YouTubeService extends BaseClient {
@@ -95,6 +101,9 @@ export class YouTubeService extends BaseClient {
    * @param params.id - The YouTube channel ID.
    * @param params.limit - The maximum number of videos to fetch.
    *                       Default: 30. Max: 5000.
+   * @param params.type - The type of videos to fetch.
+   *                      Default: 'video'.
+   *                      Allowed values: 'video', 'short', 'all'.
    * @returns A promise that resolves to an array of video IDs.
    *
    * @throws {SupadataError} If the limit is invalid (less than 1 or greater than 5000).
@@ -104,10 +113,10 @@ export class YouTubeService extends BaseClient {
       return this.fetch<YoutubeChannel>('/youtube/channel', params);
     },
     {
-      videos: async (params: ChannelVideosParams): Promise<string[]> => {
+      videos: async (params: ChannelVideosParams): Promise<VideoIds> => {
         // Validate the limit locally to avoid unnecessary API calls.
         this.validateLimit(params);
-        return this.fetch<string[]>('/youtube/channel/videos', params);
+        return this.fetch<VideoIds>('/youtube/channel/videos', params);
       },
     }
   );
@@ -133,10 +142,10 @@ export class YouTubeService extends BaseClient {
       return this.fetch<YoutubePlaylist>('/youtube/playlist', params);
     },
     {
-      videos: async (params: PlaylistVideosParams): Promise<string[]> => {
+      videos: async (params: PlaylistVideosParams): Promise<VideoIds> => {
         // Validate the limit locally to avoid unnecessary API calls.
         this.validateLimit(params);
-        return this.fetch<string[]>('/youtube/playlist/videos', params);
+        return this.fetch<VideoIds>('/youtube/playlist/videos', params);
       },
     }
   );
