@@ -1,10 +1,16 @@
 import fetchMock from 'jest-fetch-mock';
 import { Supadata } from '../index.js';
 import type {
+  Crawl,
+  CrawlJob,
   Scrape,
   SiteMap,
   Transcript,
   TranslatedTranscript,
+  YoutubeBatchJob,
+  YoutubeBatchResults,
+  YoutubeChannel,
+  YoutubePlaylist,
   YoutubeVideo,
 } from '../types.js';
 
@@ -60,7 +66,7 @@ describe('Supadata SDK', () => {
         headers: { 'content-type': 'application/json' },
       });
 
-      const result = await supadata.youtube.translate({
+      const result = await supadata.youtube.transcript.translate({
         videoId: 'test-id',
         lang: 'es',
       });
@@ -401,6 +407,144 @@ describe('Supadata SDK', () => {
       await expect(
         supadata.youtube.playlist.videos({ id: 'test-id', limit: 10000 })
       ).rejects.toThrow('Invalid limit.');
+    });
+
+    describe('Transcript Batch', () => {
+      it('should start a transcript batch job with video IDs', async () => {
+        const mockRequest = {
+          videoIds: ['dQw4w9WgXcQ', 'xvFZjo5PgG0'],
+          lang: 'en',
+        };
+        const mockResponse: YoutubeBatchJob = {
+          jobId: '123e4567-e89b-12d3-a456-426614174000',
+        };
+
+        fetchMock.mockResponseOnce(JSON.stringify(mockResponse), {
+          status: 200,
+          headers: { 'content-type': 'application/json' },
+        });
+
+        const result = await supadata.youtube.transcript.batch(mockRequest);
+
+        expect(result).toEqual(mockResponse);
+        expect(fetchMock).toHaveBeenCalledWith(
+          'https://api.supadata.ai/v1/youtube/transcript/batch',
+          expect.objectContaining({
+            method: 'POST',
+            body: JSON.stringify(mockRequest),
+          })
+        );
+      });
+
+      it('should start a transcript batch job with playlist ID and limit', async () => {
+        const mockRequest = {
+          playlistId: 'PLlaN88a7y2_plecYoJxvRFTLHVbIVAOoc',
+          limit: 20,
+        };
+        const mockResponse: YoutubeBatchJob = {
+          jobId: '123e4567-e89b-12d3-a456-426614174001',
+        };
+
+        fetchMock.mockResponseOnce(JSON.stringify(mockResponse), {
+          status: 200,
+          headers: { 'content-type': 'application/json' },
+        });
+
+        const result = await supadata.youtube.transcript.batch(mockRequest);
+
+        expect(result).toEqual(mockResponse);
+        expect(fetchMock).toHaveBeenCalledWith(
+          'https://api.supadata.ai/v1/youtube/transcript/batch',
+          expect.objectContaining({
+            method: 'POST',
+            body: JSON.stringify(mockRequest),
+          })
+        );
+      });
+
+      it('should throw error for transcript batch job with invalid limit', async () => {
+        const mockRequest = {
+          playlistId: 'some-playlist',
+          limit: 0, // Invalid limit
+        };
+
+        await expect(
+          supadata.youtube.transcript.batch(mockRequest)
+        ).rejects.toThrow('Invalid limit for batch operation.');
+        expect(fetchMock).not.toHaveBeenCalled();
+      });
+    });
+
+    describe('Video Batch', () => {
+      it('should start a video metadata batch job with channel ID', async () => {
+        const mockRequest = {
+          channelId: 'UC_9-kyTW8ZkZNDHQJ6FgpwQ',
+        };
+        const mockResponse: YoutubeBatchJob = {
+          jobId: '123e4567-e89b-12d3-a456-426614174002',
+        };
+
+        fetchMock.mockResponseOnce(JSON.stringify(mockResponse), {
+          status: 200,
+          headers: { 'content-type': 'application/json' },
+        });
+
+        const result = await supadata.youtube.video.batch(mockRequest);
+
+        expect(result).toEqual(mockResponse);
+        expect(fetchMock).toHaveBeenCalledWith(
+          'https://api.supadata.ai/v1/youtube/video/batch',
+          expect.objectContaining({
+            method: 'POST',
+            body: JSON.stringify(mockRequest),
+          })
+        );
+      });
+
+      it('should throw error for video batch job with invalid limit', async () => {
+        const mockRequest = {
+          channelId: 'some-channel',
+          limit: 5001, // Invalid limit
+        };
+
+        await expect(supadata.youtube.video.batch(mockRequest)).rejects.toThrow(
+          'Invalid limit for batch operation.'
+        );
+        expect(fetchMock).not.toHaveBeenCalled();
+      });
+    });
+
+    describe('General Batch Operations', () => {
+      it('should get batch results', async () => {
+        const jobId = '123e4567-e89b-12d3-a456-426614174000';
+        const mockResponse: YoutubeBatchResults = {
+          status: 'completed',
+          results: [],
+          stats: { total: 0, succeeded: 0, failed: 0 },
+        };
+
+        fetchMock.mockResponseOnce(JSON.stringify(mockResponse), {
+          status: 200,
+          headers: { 'content-type': 'application/json' },
+        });
+
+        const result = await supadata.youtube.batch.getBatchResults(jobId);
+
+        expect(result).toEqual(mockResponse);
+        expect(fetchMock).toHaveBeenCalledWith(
+          `https://api.supadata.ai/v1/youtube/batch/${jobId}`,
+          expect.objectContaining({
+            method: 'GET',
+          })
+        );
+      });
+
+      it('should throw error when getting batch results with no jobId', async () => {
+        await expect(
+          supadata.youtube.batch.getBatchResults('')
+        ).rejects.toThrow('Missing jobId');
+        expect(fetchMock).not.toHaveBeenCalled();
+      });
     });
   });
 

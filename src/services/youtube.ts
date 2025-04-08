@@ -3,9 +3,13 @@ import {
   SupadataError,
   Transcript,
   TranslatedTranscript,
+  YoutubeBatchJob,
+  YoutubeBatchResults,
   YoutubeChannel,
   YoutubePlaylist,
+  YoutubeTranscriptBatchRequest,
   YoutubeVideo,
+  YoutubeVideoBatchRequest,
 } from '../types.js';
 
 /**
@@ -48,35 +52,51 @@ export interface VideoIds {
 
 export class YouTubeService extends BaseClient {
   /**
-   * Fetches a transcript for a YouTube video.
+   * Handles YouTube Transcript operations.
    *
+   * @property transcript - Fetches a transcript for a YouTube video.
    * @param params - Parameters for fetching the transcript
-   * @param params.videoId - The YouTube video ID (provide either this OR url)
-   * @param params.url - The YouTube video URL (provide either this OR videoId)
-   * @param params.lang - Optional language code for the transcript
-   * @param params.text - Optional flag to return plain text instead of timestamped list
-   * @returns A promise that resolves to the video transcript
-   */
-  async transcript(params: TranscriptParams): Promise<Transcript> {
-    return this.fetch<Transcript>('/youtube/transcript', params);
-  }
-
-  /**
-   * Translates a YouTube video transcript to a specified language.
    *
+   * @property translate - Translates a YouTube video transcript.
    * @param params - Parameters for translating the transcript
-   * @param params.videoId - The YouTube video ID (provide either this OR url)
-   * @param params.url - The YouTube video URL (provide either this OR videoId)
-   * @param params.lang - The target language code for translation
-   * @param params.text - Optional flag to return plain text instead of timestamped list
-   * @returns A promise that resolves to the translated transcript
+   *
+   * @property batch - Batch fetches transcripts for multiple YouTube videos.
+   * @param params - Parameters for the transcript batch job
    */
-  async translate(params: TranslateParams): Promise<TranslatedTranscript> {
-    return this.fetch<TranslatedTranscript>(
-      '/youtube/transcript/translate',
-      params
-    );
-  }
+  transcript = Object.assign(
+    /**
+     * Fetches a transcript for a YouTube video.
+     */
+    async (params: TranscriptParams): Promise<Transcript> => {
+      return this.fetch<Transcript>('/youtube/transcript', params);
+    },
+    {
+      /**
+       * Translates a YouTube video transcript to a specified language.
+       */
+      translate: async (
+        params: TranslateParams
+      ): Promise<TranslatedTranscript> => {
+        return this.fetch<TranslatedTranscript>(
+          '/youtube/transcript/translate',
+          params
+        );
+      },
+      /**
+       * Batch fetches transcripts for multiple YouTube videos.
+       */
+      batch: async (
+        params: YoutubeTranscriptBatchRequest
+      ): Promise<YoutubeBatchJob> => {
+        this.validateBatchLimit(params);
+        return this.fetch<YoutubeBatchJob>(
+          '/youtube/transcript/batch',
+          params,
+          'POST'
+        );
+      },
+    }
+  );
 
   /**
    * Fetches a YouTube video based on the provided parameters.
@@ -84,10 +104,31 @@ export class YouTubeService extends BaseClient {
    * @param params - The parameters required to fetch the YouTube video.
    * @param params.id - The YouTube video ID.
    * @returns A promise that resolves to a `YoutubeVideo` object.
+   *
+   * @property batch - Batch fetches metadata for multiple YouTube videos.
+   * @param params - Parameters for the video metadata batch job
+   * @returns A promise that resolves to a `YoutubeBatchJob` object with the job ID.
    */
-  async video(params: ResourceParams): Promise<YoutubeVideo> {
-    return this.fetch<YoutubeVideo>('/youtube/video', params);
-  }
+  video = Object.assign(
+    async (params: ResourceParams): Promise<YoutubeVideo> => {
+      return this.fetch<YoutubeVideo>('/youtube/video', params);
+    },
+    {
+      /**
+       * Batch fetches metadata for multiple YouTube videos.
+       */
+      batch: async (
+        params: YoutubeVideoBatchRequest
+      ): Promise<YoutubeBatchJob> => {
+        this.validateBatchLimit(params);
+        return this.fetch<YoutubeBatchJob>(
+          '/youtube/video/batch',
+          params,
+          'POST'
+        );
+      },
+    }
+  );
 
   /**
    * Fetches YouTube channel information and videos.
@@ -114,7 +155,6 @@ export class YouTubeService extends BaseClient {
     },
     {
       videos: async (params: ChannelVideosParams): Promise<VideoIds> => {
-        // Validate the limit locally to avoid unnecessary API calls.
         this.validateLimit(params);
         return this.fetch<VideoIds>('/youtube/channel/videos', params);
       },
@@ -150,6 +190,29 @@ export class YouTubeService extends BaseClient {
     }
   );
 
+  /**
+   * Handles generic YouTube batch operations like retrieving results.
+   *
+   * @property getBatchResults - Retrieves the status and results of a batch job.
+   * @param jobId - The ID of the batch job.
+   * @returns A promise that resolves to the `YoutubeBatchResults`.
+   */
+  batch = {
+    /**
+     * Retrieves the status and results of a batch job.
+     */
+    getBatchResults: async (jobId: string): Promise<YoutubeBatchResults> => {
+      if (!jobId) {
+        throw new SupadataError({
+          error: 'missing-parameters',
+          message: 'Missing jobId',
+          details: 'The jobId parameter is required to get batch results.',
+        });
+      }
+      return this.fetch<YoutubeBatchResults>(`/youtube/batch/${jobId}`);
+    },
+  };
+
   private validateLimit(params: { limit?: number }) {
     if (
       params.limit != undefined &&
@@ -159,6 +222,21 @@ export class YouTubeService extends BaseClient {
       throw new SupadataError({
         error: 'invalid-request',
         message: 'Invalid limit.',
+        details: 'The limit must be between 1 and 5000.',
+      });
+    }
+  }
+
+  // Add a specific validator for batch limits as per documentation (Max: 5000, Default: 10)
+  private validateBatchLimit(params: { limit?: number }) {
+    if (
+      params.limit != undefined &&
+      params.limit != null &&
+      (params.limit < 1 || params.limit > 5000)
+    ) {
+      throw new SupadataError({
+        error: 'invalid-request',
+        message: 'Invalid limit for batch operation.',
         details: 'The limit must be between 1 and 5000.',
       });
     }
