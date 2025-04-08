@@ -66,7 +66,7 @@ describe('Supadata SDK', () => {
         headers: { 'content-type': 'application/json' },
       });
 
-      const result = await supadata.youtube.transcript.translate({
+      const result = await supadata.youtube.translate({
         videoId: 'test-id',
         lang: 'es',
       });

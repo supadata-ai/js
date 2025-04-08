@@ -72,17 +72,6 @@ export class YouTubeService extends BaseClient {
     },
     {
       /**
-       * Translates a YouTube video transcript to a specified language.
-       */
-      translate: async (
-        params: TranslateParams
-      ): Promise<TranslatedTranscript> => {
-        return this.fetch<TranslatedTranscript>(
-          '/youtube/transcript/translate',
-          params
-        );
-      },
-      /**
        * Batch fetches transcripts for multiple YouTube videos.
        */
       batch: async (
@@ -211,6 +200,13 @@ export class YouTubeService extends BaseClient {
       }
       return this.fetch<YoutubeBatchResults>(`/youtube/batch/${jobId}`);
     },
+  };
+
+  /**
+   * Translates a YouTube video transcript to a specified language.
+   */
+  translate = async (params: TranslateParams): Promise<TranslatedTranscript> => {
+    return this.fetch<TranslatedTranscript>('/youtube/transcript/translate', params);
   };
 
   private validateLimit(params: { limit?: number }) {
