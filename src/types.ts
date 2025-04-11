@@ -114,3 +114,46 @@ export interface YoutubePlaylist {
   description: string;
   thumbnail: string;
 }
+
+export interface YoutubeBatchSource {
+  videoIds?: string[];
+  playlistId?: string;
+  channelId?: string;
+  limit?: number;
+}
+
+export interface YoutubeTranscriptBatchRequest extends YoutubeBatchSource {
+  lang?: string;
+}
+
+export interface YoutubeVideoBatchRequest extends YoutubeBatchSource {}
+
+export interface YoutubeBatchJob {
+  jobId: string;
+}
+
+export type YoutubeBatchJobStatus =
+  | 'queued'
+  | 'active'
+  | 'completed'
+  | 'failed';
+
+export interface YoutubeBatchResultItem {
+  videoId: string;
+  transcript?: Transcript;
+  video?: YoutubeVideo;
+  errorCode?: string;
+}
+
+export interface YoutubeBatchStats {
+  total: number;
+  succeeded: number;
+  failed: number;
+}
+
+export interface YoutubeBatchResults {
+  status: YoutubeBatchJobStatus;
+  results?: YoutubeBatchResultItem[];
+  stats?: YoutubeBatchStats;
+  completedAt?: string;
+}

@@ -72,6 +72,32 @@ const playlistVideos: VideoIds = await supadata.youtube.playlist.videos({
   limit: 10,
 });
 
+// Start a YouTube transcript batch job
+const transcriptBatch = await supadata.youtube.transcript.batch({
+  videoIds: ['dQw4w9WgXcQ', 'xvFZjo5PgG0'],
+  // playlistId: 'PLlaN88a7y2_plecYoJxvRFTLHVbIVAOoc' // alternatively
+  // channelId: 'UC_9-kyTW8ZkZNDHQJ6FgpwQ' // alternatively
+  lang: 'en'
+});
+console.log(`Started transcript batch job: ${transcriptBatch.jobId}`);
+
+// Start a YouTube video metadata batch job
+const videoBatch = await supadata.youtube.video.batch({
+  videoIds: ['dQw4w9WgXcQ', 'xvFZjo5PgG0', 'L_jWHffIx5E']
+  // playlistId: 'PLlaN88a7y2_plecYoJxvRFTLHVbIVAOoc' // alternatively
+  // channelId: 'UC_9-kyTW8ZkZNDHQJ6FgpwQ' // alternatively
+});
+console.log(`Started video batch job: ${videoBatch.jobId}`);
+
+// Get results for a batch job (poll until status is 'completed' or 'failed')
+const batchResults = await supadata.youtube.batch.getBatchResults(transcriptBatch.jobId); // or videoBatch.jobId
+if (batchResults.status === 'completed') {
+  console.log('Batch job completed:', batchResults.results);
+  console.log('Stats:', batchResults.stats);
+} else {
+  console.log('Batch job status:', batchResults.status);
+}
+
 // Scrape web content
 const webContent: Scrape = await supadata.web.scrape('https://supadata.ai');
 
