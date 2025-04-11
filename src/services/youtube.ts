@@ -74,6 +74,7 @@ export class YouTubeService extends BaseClient {
        * @param params.videoIds - Array of YouTube video IDs to fetch transcripts for
        * @param params.lang - The language code for the transcripts (optional)
        * @param params.limit - Maximum number of videos to process (optional, default: 10, max: 5000)
+       * @param params.text - Whether to return only the text content (optional)
        * @returns A promise that resolves to a YoutubeBatchJob object with the job ID
        */
       batch: async (
@@ -213,8 +214,13 @@ export class YouTubeService extends BaseClient {
    * @param params.text - Whether to return only the text content (optional)
    * @returns A promise that resolves to a TranslatedTranscript object
    */
-  translate = async (params: TranslateParams): Promise<TranslatedTranscript> => {
-    return this.fetch<TranslatedTranscript>('/youtube/transcript/translate', params);
+  translate = async (
+    params: TranslateParams
+  ): Promise<TranslatedTranscript> => {
+    return this.fetch<TranslatedTranscript>(
+      '/youtube/transcript/translate',
+      params
+    );
   };
 
   private validateLimit(params: { limit?: number }) {

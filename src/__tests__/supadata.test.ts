@@ -414,6 +414,7 @@ describe('Supadata SDK', () => {
         const mockRequest = {
           videoIds: ['dQw4w9WgXcQ', 'xvFZjo5PgG0'],
           lang: 'en',
+          text: true,
         };
         const mockResponse: YoutubeBatchJob = {
           jobId: '123e4567-e89b-12d3-a456-426614174000',

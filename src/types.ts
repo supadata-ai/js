@@ -124,6 +124,7 @@ export interface YoutubeBatchSource {
 
 export interface YoutubeTranscriptBatchRequest extends YoutubeBatchSource {
   lang?: string;
+  text?: boolean;
 }
 
 export interface YoutubeVideoBatchRequest extends YoutubeBatchSource {}
