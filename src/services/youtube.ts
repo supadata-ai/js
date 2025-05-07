@@ -38,7 +38,7 @@ export interface ResourceParams {
 
 export interface ChannelVideosParams extends ResourceParams {
   limit?: number;
-  type?: 'video' | 'short' | 'all';
+  type?: 'video' | 'short' | 'live' | 'all';
 }
 
 export interface PlaylistVideosParams extends ResourceParams {
@@ -48,6 +48,7 @@ export interface PlaylistVideosParams extends ResourceParams {
 export interface VideoIds {
   videoIds: string[];
   shortIds: string[];
+  liveIds: string[];
 }
 
 export class YouTubeService extends BaseClient {
@@ -143,8 +144,8 @@ export class YouTubeService extends BaseClient {
        * @param params - The parameters required to fetch the YouTube channel videos
        * @param params.id - The YouTube channel ID
        * @param params.limit - The maximum number of videos to fetch (default: 30, max: 5000)
-       * @param params.type - The type of videos to fetch ('video', 'short', or 'all', default: 'video')
-       * @returns A promise that resolves to an object containing arrays of video IDs and short IDs
+       * @param params.type - The type of videos to fetch ('video', 'short', 'live', or 'all', default: 'video')
+       * @returns A promise that resolves to an object containing arrays of video IDs, short IDs, and live IDs
        * @throws {SupadataError} If the limit is invalid (less than 1 or greater than 5000)
        */
       videos: async (params: ChannelVideosParams): Promise<VideoIds> => {
@@ -173,7 +174,7 @@ export class YouTubeService extends BaseClient {
        * @param params - The parameters required to fetch the playlist videos
        * @param params.id - The YouTube playlist ID
        * @param params.limit - The maximum number of videos to fetch (default: 30, max: 5000)
-       * @returns A promise that resolves to an object containing arrays of video IDs and short IDs
+       * @returns A promise that resolves to an object containing arrays of video IDs, short IDs, and live IDs
        * @throws {SupadataError} If the limit is invalid (less than 1 or greater than 5000)
        */
       videos: async (params: PlaylistVideosParams): Promise<VideoIds> => {
