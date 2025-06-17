@@ -53,12 +53,11 @@ export interface SupadataConfig {
 export class SupadataError extends Error {
   error:
     | 'invalid-request'
-    | 'missing-parameters'
     | 'internal-error'
     | 'transcript-unavailable'
-    | 'video-not-found'
-    | 'video-id-invalid'
-    | 'youtube-api-error'
+    | 'not-found'
+    | 'unauthorized'
+    | 'upgrade-required'
     | 'limit-exceeded';
   details: string;
   documentationUrl: string;

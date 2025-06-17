@@ -197,7 +197,7 @@ export class YouTubeService extends BaseClient {
     getBatchResults: async (jobId: string): Promise<YoutubeBatchResults> => {
       if (!jobId) {
         throw new SupadataError({
-          error: 'missing-parameters',
+          error: 'invalid-request',
           message: 'Missing jobId',
           details: 'The jobId parameter is required to get batch results.',
         });

@@ -132,7 +132,7 @@ describe('Supadata SDK', () => {
       });
 
       await expect(supadata.youtube.video({ id: videoId })).rejects.toThrow(
-        'Endpoint does not exist'
+        'The requested item could not be found'
       );
     });
 
@@ -185,7 +185,7 @@ describe('Supadata SDK', () => {
       });
 
       await expect(supadata.youtube.channel({ id: channelId })).rejects.toThrow(
-        'Endpoint does not exist'
+        'The requested item could not be found'
       );
     });
 
@@ -258,7 +258,7 @@ describe('Supadata SDK', () => {
 
       await expect(
         supadata.youtube.channel.videos({ id: channelId })
-      ).rejects.toThrow('Endpoint does not exist');
+      ).rejects.toThrow('The requested item could not be found');
     });
 
     it('should throw an error with invalid limit', async () => {
@@ -320,7 +320,7 @@ describe('Supadata SDK', () => {
 
       await expect(
         supadata.youtube.playlist({ id: playlistId })
-      ).rejects.toThrow('Endpoint does not exist');
+      ).rejects.toThrow('The requested item could not be found');
     });
 
     it('should get a list of videos in the playlist without limit', async () => {
@@ -392,7 +392,7 @@ describe('Supadata SDK', () => {
 
       await expect(
         supadata.youtube.playlist.videos({ id: playlistId })
-      ).rejects.toThrow('Endpoint does not exist');
+      ).rejects.toThrow('The requested item could not be found');
     });
 
     it('should throw an error with invalid limit', async () => {

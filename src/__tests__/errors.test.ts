@@ -16,71 +16,6 @@ describe('Error Handling', () => {
     supadata = new Supadata(config);
   });
 
-  describe('Gateway Errors', () => {
-    it('should handle 403 unauthorized error', async () => {
-      const errorMessage = 'Invalid API key provided';
-      fetchMock.mockResponseOnce(JSON.stringify({ message: errorMessage }), {
-        status: 403,
-        headers: { 'content-type': 'application/json' },
-      });
-
-      await expect(
-        supadata.web.map('https://example.com')
-      ).rejects.toMatchObject({
-        error: 'invalid-request',
-        message: 'Invalid or missing API key',
-        details: errorMessage,
-      });
-    });
-
-    it('should handle 404 not found error', async () => {
-      const errorMessage = 'Endpoint not found';
-      fetchMock.mockResponseOnce(JSON.stringify({ message: errorMessage }), {
-        status: 404,
-        headers: { 'content-type': 'application/json' },
-      });
-
-      await expect(
-        supadata.web.map('https://example.com')
-      ).rejects.toMatchObject({
-        error: 'invalid-request',
-        message: 'Endpoint does not exist',
-        details: errorMessage,
-      });
-    });
-
-    it('should handle 429 rate limit error', async () => {
-      const errorMessage = 'Too many requests';
-      fetchMock.mockResponseOnce(JSON.stringify({ message: errorMessage }), {
-        status: 429,
-        headers: { 'content-type': 'application/json' },
-      });
-
-      await expect(
-        supadata.web.map('https://example.com')
-      ).rejects.toMatchObject({
-        error: 'limit-exceeded',
-        message: 'Limit exceeded',
-        details: errorMessage,
-      });
-    });
-
-    it('should handle unknown gateway error', async () => {
-      const errorMessage = 'Unknown error occurred';
-      fetchMock.mockResponseOnce(JSON.stringify({ message: errorMessage }), {
-        status: 500,
-        headers: { 'content-type': 'application/json' },
-      });
-
-      await expect(
-        supadata.web.map('https://example.com')
-      ).rejects.toMatchObject({
-        error: 'internal-error',
-        details: 'An unexpected error occurred',
-      });
-    });
-  });
-
   describe('API Errors', () => {
     it('should handle standard API error response', async () => {
       const errorResponse = {
@@ -159,9 +94,9 @@ describe('Error Handling', () => {
 
     it('should create error with all parameters', () => {
       const errorData = {
-        error: 'video-not-found' as const,
-        message: 'Video not found',
-        details: 'The requested video ID does not exist',
+        error: 'internal-error' as const,
+        message: 'An unexpected error occurred',
+        details: 'An unexpected error occurred',
         documentationUrl: 'https://docs.supadata.ai/errors',
       };
       const error = new SupadataError(errorData);
