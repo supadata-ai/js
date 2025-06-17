@@ -1,4 +1,8 @@
 import { SupadataConfig, SupadataError } from './types.js';
+// @ts-expect-error: Non-TS import for version from package.json
+import pkg from '../package.json';
+
+const USER_AGENT = `supadata-js/${pkg.version}`;
 
 export class BaseClient {
   protected config: SupadataConfig;
@@ -40,6 +44,7 @@ export class BaseClient {
       headers: {
         'x-api-key': this.config.apiKey,
         'Content-Type': 'application/json',
+        'User-Agent': USER_AGENT,
       },
     };
 
