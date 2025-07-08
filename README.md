@@ -15,14 +15,18 @@ npm install @supadata/js
 
 ## Usage
 
+### Initialization
+
 ```typescript
 import {
   Crawl,
   CrawlJob,
+  JobResult,
   Map,
   Scrape,
   Supadata,
   Transcript,
+  TranscriptOrJobId,
   YoutubeChannel,
   YoutubePlaylist,
   YoutubeVideo,
@@ -32,7 +36,44 @@ import {
 const supadata = new Supadata({
   apiKey: 'YOUR_API_KEY',
 });
+```
 
+### Transcripts
+
+```typescript
+// Get transcript from any supported platform (YouTube, TikTok, Twitter) or file
+const transcriptResult = await supadata.transcript({
+  url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+  lang: 'en', // optional
+  text: true, // optional: return plain text instead of timestamped chunks
+  mode: 'auto', // optional: 'native', 'auto', or 'generate'
+});
+
+// Check if we got a transcript directly or a job ID for async processing
+if ('jobId' in transcriptResult) {
+  // For large files, we get a job ID and need to poll for results
+  console.log(`Started transcript job: ${transcriptResult.jobId}`);
+
+  // Poll for job status
+  const jobResult = await supadata.transcript.getJobStatus(
+    transcriptResult.jobId
+  );
+  if (jobResult.status === 'completed') {
+    console.log('Transcript:', jobResult.result);
+  } else if (jobResult.status === 'failed') {
+    console.error('Transcript failed:', jobResult.error);
+  } else {
+    console.log('Job status:', jobResult.status); // 'queued' or 'active'
+  }
+} else {
+  // For smaller files, we get the transcript directly
+  console.log('Transcript:', transcriptResult);
+}
+```
+
+### YouTube
+
+```typescript
 // Get YouTube transcript
 const transcript: Transcript = await supadata.youtube.transcript({
   url: 'https://youtu.be/dQw4w9WgXcQ',
@@ -99,7 +140,11 @@ if (batchResults.status === 'completed') {
 } else {
   console.log('Batch job status:', batchResults.status);
 }
+```
 
+### Web
+
+```typescript
 // Scrape web content
 const webContent: Scrape = await supadata.web.scrape('https://supadata.ai');
 
@@ -107,7 +152,7 @@ const webContent: Scrape = await supadata.web.scrape('https://supadata.ai');
 const siteMap: Map = await supadata.web.map('https://supadata.ai');
 
 // Crawl website
-const crawl: Crawl = await supadata.web.crawl({
+const crawl: JobId = await supadata.web.crawl({
   url: 'https://supadata.ai',
   limit: 10,
 });

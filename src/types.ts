@@ -35,10 +35,6 @@ export interface CrawlRequest {
   limit?: number;
 }
 
-export interface Crawl {
-  jobId: string;
-}
-
 export interface CrawlJob {
   status: 'scraping' | 'completed' | 'failed' | 'cancelled';
   pages?: Scrape[];
@@ -128,15 +124,15 @@ export interface YoutubeTranscriptBatchRequest extends YoutubeBatchSource {
 
 export interface YoutubeVideoBatchRequest extends YoutubeBatchSource {}
 
-export interface YoutubeBatchJob {
+export interface JobId {
   jobId: string;
 }
 
-export type YoutubeBatchJobStatus =
-  | 'queued'
-  | 'active'
-  | 'completed'
-  | 'failed';
+export interface YoutubeBatchJob extends JobId {}
+
+export type JobStatus = 'queued' | 'active' | 'completed' | 'failed';
+
+export type YoutubeBatchJobStatus = JobStatus;
 
 export interface YoutubeBatchResultItem {
   videoId: string;
@@ -156,4 +152,17 @@ export interface YoutubeBatchResults {
   results?: YoutubeBatchResultItem[];
   stats?: YoutubeBatchStats;
   completedAt?: string;
+}
+
+export type TranscriptOrJobId = Transcript | JobId;
+
+export interface JobResult<T = any> {
+  status: JobStatus;
+  result?: T | null;
+  error?: {
+    error: SupadataError['error'];
+    message: string;
+    details: string;
+    documentationUrl?: string;
+  } | null;
 }

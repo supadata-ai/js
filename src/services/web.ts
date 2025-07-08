@@ -1,5 +1,5 @@
 import { BaseClient } from '../client.js';
-import { Crawl, CrawlJob, CrawlRequest, Scrape, SiteMap } from '../types.js';
+import { CrawlJob, CrawlRequest, JobId, Scrape, SiteMap } from '../types.js';
 
 export class WebService extends BaseClient {
   /**
@@ -30,8 +30,8 @@ export class WebService extends BaseClient {
    * @param request.limit - Maximum number of pages to crawl (default: 100, max: 5000)
    * @returns A promise that resolves to the crawl job id
    */
-  async crawl(request: CrawlRequest): Promise<Crawl> {
-    return this.fetch<Crawl>('/web/crawl', request, 'POST');
+  async crawl(request: CrawlRequest): Promise<JobId> {
+    return this.fetch<JobId>('/web/crawl', request, 'POST');
   }
 
   /**

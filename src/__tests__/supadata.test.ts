@@ -1,8 +1,9 @@
 import fetchMock from 'jest-fetch-mock';
 import { Supadata } from '../index.js';
 import type {
-  Crawl,
   CrawlJob,
+  JobId,
+  JobResult,
   Scrape,
   SiteMap,
   Transcript,
@@ -48,10 +49,11 @@ describe('Supadata SDK', () => {
         'https://api.supadata.ai/v1/youtube/transcript?videoId=test-id',
         expect.objectContaining({
           method: 'GET',
-          headers: {
+          headers: expect.objectContaining({
             'x-api-key': 'test-api-key',
             'Content-Type': 'application/json',
-          },
+            'User-Agent': expect.stringContaining('supadata-js'),
+          }),
         })
       );
     });
@@ -75,10 +77,11 @@ describe('Supadata SDK', () => {
         'https://api.supadata.ai/v1/youtube/transcript/translate?videoId=test-id&lang=es',
         expect.objectContaining({
           method: 'GET',
-          headers: {
+          headers: expect.objectContaining({
             'x-api-key': 'test-api-key',
             'Content-Type': 'application/json',
-          },
+            'User-Agent': expect.stringContaining('supadata-js'),
+          }),
         })
       );
     });
@@ -111,10 +114,11 @@ describe('Supadata SDK', () => {
         `https://api.supadata.ai/v1/youtube/video?id=${videoId}`,
         expect.objectContaining({
           method: 'GET',
-          headers: {
+          headers: expect.objectContaining({
             'x-api-key': 'test-api-key',
             'Content-Type': 'application/json',
-          },
+            'User-Agent': expect.stringContaining('supadata-js'),
+          }),
         })
       );
     });
@@ -163,10 +167,11 @@ describe('Supadata SDK', () => {
         `https://api.supadata.ai/v1/youtube/channel?id=${channelId}`,
         expect.objectContaining({
           method: 'GET',
-          headers: {
+          headers: expect.objectContaining({
             'x-api-key': 'test-api-key',
             'Content-Type': 'application/json',
-          },
+            'User-Agent': expect.stringContaining('supadata-js'),
+          }),
         })
       );
     });
@@ -206,10 +211,11 @@ describe('Supadata SDK', () => {
         `https://api.supadata.ai/v1/youtube/channel/videos?id=${channelId}`,
         expect.objectContaining({
           method: 'GET',
-          headers: {
+          headers: expect.objectContaining({
             'x-api-key': 'test-api-key',
             'Content-Type': 'application/json',
-          },
+            'User-Agent': expect.stringContaining('supadata-js'),
+          }),
         })
       );
     });
@@ -235,10 +241,11 @@ describe('Supadata SDK', () => {
         `https://api.supadata.ai/v1/youtube/channel/videos?id=${channelId}&limit=${limit}`,
         expect.objectContaining({
           method: 'GET',
-          headers: {
+          headers: expect.objectContaining({
             'x-api-key': 'test-api-key',
             'Content-Type': 'application/json',
-          },
+            'User-Agent': expect.stringContaining('supadata-js'),
+          }),
         })
       );
     });
@@ -297,10 +304,11 @@ describe('Supadata SDK', () => {
         `https://api.supadata.ai/v1/youtube/playlist?id=${playlistId}`,
         expect.objectContaining({
           method: 'GET',
-          headers: {
+          headers: expect.objectContaining({
             'x-api-key': 'test-api-key',
             'Content-Type': 'application/json',
-          },
+            'User-Agent': expect.stringContaining('supadata-js'),
+          }),
         })
       );
     });
@@ -340,10 +348,11 @@ describe('Supadata SDK', () => {
         `https://api.supadata.ai/v1/youtube/playlist/videos?id=${playlistId}`,
         expect.objectContaining({
           method: 'GET',
-          headers: {
+          headers: expect.objectContaining({
             'x-api-key': 'test-api-key',
             'Content-Type': 'application/json',
-          },
+            'User-Agent': expect.stringContaining('supadata-js'),
+          }),
         })
       );
     });
@@ -369,10 +378,11 @@ describe('Supadata SDK', () => {
         `https://api.supadata.ai/v1/youtube/playlist/videos?id=${playlistId}&limit=${limit}`,
         expect.objectContaining({
           method: 'GET',
-          headers: {
+          headers: expect.objectContaining({
             'x-api-key': 'test-api-key',
             'Content-Type': 'application/json',
-          },
+            'User-Agent': expect.stringContaining('supadata-js'),
+          }),
         })
       );
     });
@@ -571,10 +581,11 @@ describe('Supadata SDK', () => {
         'https://api.supadata.ai/v1/web/scrape?url=https%3A%2F%2Fsupadata.ai',
         expect.objectContaining({
           method: 'GET',
-          headers: {
+          headers: expect.objectContaining({
             'x-api-key': 'test-api-key',
             'Content-Type': 'application/json',
-          },
+            'User-Agent': expect.stringContaining('supadata-js'),
+          }),
         })
       );
     });
@@ -594,12 +605,234 @@ describe('Supadata SDK', () => {
         'https://api.supadata.ai/v1/web/map?url=https%3A%2F%2Fsupadata.ai',
         expect.objectContaining({
           method: 'GET',
-          headers: {
+          headers: expect.objectContaining({
             'x-api-key': 'test-api-key',
             'Content-Type': 'application/json',
-          },
+            'User-Agent': expect.stringContaining('supadata-js'),
+          }),
         })
       );
+    });
+  });
+
+  describe('Transcript Service', () => {
+    it('should get transcript directly (synchronous response)', async () => {
+      const mockResponse: Transcript = {
+        content: [
+          { text: 'Hello world', offset: 0, duration: 1000, lang: 'en' },
+        ],
+        lang: 'en',
+        availableLangs: ['en', 'es'],
+      };
+
+      fetchMock.mockResponseOnce(JSON.stringify(mockResponse), {
+        headers: { 'content-type': 'application/json' },
+      });
+
+      const result = await supadata.transcript({
+        url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+        lang: 'en',
+        text: false,
+      });
+
+      expect(result).toEqual(mockResponse);
+      expect(fetchMock).toHaveBeenCalledWith(
+        'https://api.supadata.ai/v1/transcript?url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3DdQw4w9WgXcQ&lang=en&text=false',
+        expect.objectContaining({
+          method: 'GET',
+          headers: expect.objectContaining({
+            'x-api-key': 'test-api-key',
+            'Content-Type': 'application/json',
+            'User-Agent': expect.stringContaining('supadata-js'),
+          }),
+        })
+      );
+    });
+
+    it('should get job id for async processing', async () => {
+      const mockResponse: JobId = {
+        jobId: '123e4567-e89b-12d3-a456-426614174000',
+      };
+
+      fetchMock.mockResponseOnce(JSON.stringify(mockResponse), {
+        headers: { 'content-type': 'application/json' },
+      });
+
+      const result = await supadata.transcript({
+        url: 'https://www.tiktok.com/@user/video/1234567890',
+        mode: 'generate',
+      });
+
+      expect(result).toEqual(mockResponse);
+      expect(fetchMock).toHaveBeenCalledWith(
+        'https://api.supadata.ai/v1/transcript?url=https%3A%2F%2Fwww.tiktok.com%2F%40user%2Fvideo%2F1234567890&mode=generate',
+        expect.objectContaining({
+          method: 'GET',
+          headers: expect.objectContaining({
+            'x-api-key': 'test-api-key',
+            'Content-Type': 'application/json',
+            'User-Agent': expect.stringContaining('supadata-js'),
+          }),
+        })
+      );
+    });
+
+    it('should get transcript with all parameters', async () => {
+      const mockResponse: Transcript = {
+        content: 'Hello world transcript',
+        lang: 'en',
+        availableLangs: ['en'],
+      };
+
+      fetchMock.mockResponseOnce(JSON.stringify(mockResponse), {
+        headers: { 'content-type': 'application/json' },
+      });
+
+      const result = await supadata.transcript({
+        url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+        lang: 'en',
+        text: true,
+        chunkSize: 500,
+        mode: 'auto',
+      });
+
+      expect(result).toEqual(mockResponse);
+      expect(fetchMock).toHaveBeenCalledWith(
+        'https://api.supadata.ai/v1/transcript?url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3DdQw4w9WgXcQ&lang=en&text=true&chunkSize=500&mode=auto',
+        expect.objectContaining({
+          method: 'GET',
+          headers: expect.objectContaining({
+            'x-api-key': 'test-api-key',
+            'Content-Type': 'application/json',
+            'User-Agent': expect.stringContaining('supadata-js'),
+          }),
+        })
+      );
+    });
+
+    it('should get job status when job is completed', async () => {
+      const jobId = '123e4567-e89b-12d3-a456-426614174000';
+      const mockResponse: JobResult<Transcript> = {
+        status: 'completed',
+        result: {
+          content: [
+            {
+              text: 'Completed transcript',
+              offset: 0,
+              duration: 1000,
+              lang: 'en',
+            },
+          ],
+          lang: 'en',
+          availableLangs: ['en'],
+        },
+        error: null,
+      };
+
+      fetchMock.mockResponseOnce(JSON.stringify(mockResponse), {
+        headers: { 'content-type': 'application/json' },
+      });
+
+      const result = await supadata.transcript.getJobStatus(jobId);
+
+      expect(result).toEqual(mockResponse);
+      expect(fetchMock).toHaveBeenCalledWith(
+        `https://api.supadata.ai/v1/transcript/${jobId}`,
+        expect.objectContaining({
+          method: 'GET',
+          headers: expect.objectContaining({
+            'x-api-key': 'test-api-key',
+            'Content-Type': 'application/json',
+            'User-Agent': expect.stringContaining('supadata-js'),
+          }),
+        })
+      );
+    });
+
+    it('should get job status when job is still active', async () => {
+      const jobId = '123e4567-e89b-12d3-a456-426614174001';
+      const mockResponse: JobResult<Transcript> = {
+        status: 'active',
+        result: null,
+        error: null,
+      };
+
+      fetchMock.mockResponseOnce(JSON.stringify(mockResponse), {
+        headers: { 'content-type': 'application/json' },
+      });
+
+      const result = await supadata.transcript.getJobStatus(jobId);
+
+      expect(result).toEqual(mockResponse);
+      expect(fetchMock).toHaveBeenCalledWith(
+        `https://api.supadata.ai/v1/transcript/${jobId}`,
+        expect.objectContaining({
+          method: 'GET',
+          headers: expect.objectContaining({
+            'x-api-key': 'test-api-key',
+            'Content-Type': 'application/json',
+            'User-Agent': expect.stringContaining('supadata-js'),
+          }),
+        })
+      );
+    });
+
+    it('should get job status when job failed', async () => {
+      const jobId = '123e4567-e89b-12d3-a456-426614174002';
+      const mockResponse: JobResult<Transcript> = {
+        status: 'failed',
+        result: null,
+        error: {
+          error: 'transcript-unavailable',
+          message: 'Transcript not available',
+          details: 'The video does not have a transcript available',
+        },
+      };
+
+      fetchMock.mockResponseOnce(JSON.stringify(mockResponse), {
+        headers: { 'content-type': 'application/json' },
+      });
+
+      const result = await supadata.transcript.getJobStatus(jobId);
+
+      expect(result).toEqual(mockResponse);
+      expect(fetchMock).toHaveBeenCalledWith(
+        `https://api.supadata.ai/v1/transcript/${jobId}`,
+        expect.objectContaining({
+          method: 'GET',
+          headers: expect.objectContaining({
+            'x-api-key': 'test-api-key',
+            'Content-Type': 'application/json',
+            'User-Agent': expect.stringContaining('supadata-js'),
+          }),
+        })
+      );
+    });
+
+    it('should throw error when getting job status with no jobId', async () => {
+      await expect(supadata.transcript.getJobStatus('')).rejects.toThrow(
+        'Missing jobId'
+      );
+      expect(fetchMock).not.toHaveBeenCalled();
+    });
+
+    it('should handle API errors', async () => {
+      const mockResponse = {
+        error: 'not-found',
+        message: 'Video not found',
+        details: 'The specified video could not be found',
+      };
+
+      fetchMock.mockResponseOnce(JSON.stringify(mockResponse), {
+        status: 404,
+        headers: { 'content-type': 'application/json' },
+      });
+
+      await expect(
+        supadata.transcript({
+          url: 'https://www.youtube.com/watch?v=invalid',
+        })
+      ).rejects.toThrow('Video not found');
     });
   });
 
