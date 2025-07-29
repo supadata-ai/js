@@ -41,7 +41,7 @@ const supadata = new Supadata({
 ### Transcripts
 
 ```typescript
-// Get transcript from any supported platform (YouTube, TikTok, Twitter) or file
+// Get transcript from any supported platform (YouTube, TikTok, Instagram, Twitter) or file
 const transcriptResult = await supadata.transcript({
   url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
   lang: 'en', // optional

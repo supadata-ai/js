@@ -24,7 +24,7 @@ async function main() {
 
     await new Promise((resolve) => setTimeout(resolve, 2000));
 
-    // Example 2: Get transcript from any platform (YouTube, TikTok, Twitter) or file
+    // Example 2: Get transcript from any platform (YouTube, TikTok, Instagram, Twitter) or file
     console.log('\nℹ️ Getting transcript from any platform...');
     const transcriptResult = await supadata.transcript({
       url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
@@ -35,19 +35,23 @@ async function main() {
 
     // Check if we got a transcript directly or a job ID for async processing
     if ('jobId' in transcriptResult) {
-      console.log(`ℹ️ Got job ID for async processing: ${transcriptResult.jobId}`);
-      
+      console.log(
+        `ℹ️ Got job ID for async processing: ${transcriptResult.jobId}`
+      );
+
       // Poll for job status (simplified polling for example)
       let attempts = 0;
       const maxAttempts = 5;
-      
+
       while (attempts < maxAttempts) {
         attempts++;
         await new Promise((resolve) => setTimeout(resolve, 3000)); // Wait 3 seconds
-        
-        const jobResult = await supadata.transcript.getJobStatus(transcriptResult.jobId);
+
+        const jobResult = await supadata.transcript.getJobStatus(
+          transcriptResult.jobId
+        );
         console.log(`ℹ️ [Attempt ${attempts}] Job status: ${jobResult.status}`);
-        
+
         if (jobResult.status === 'completed') {
           console.log('ℹ️ Transcript result:', jobResult.result);
           break;
@@ -140,10 +144,11 @@ async function main() {
 
     // Example 12: Start YouTube transcript batch job
     console.log('\nℹ️ Starting YouTube transcript batch job...');
-    const transcriptBatchJob: YoutubeBatchJob = await supadata.youtube.transcript.batch({
-      videoIds: ['dQw4w9WgXcQ', 'xvFZjo5PgG0'],
-      lang: 'en',
-    });
+    const transcriptBatchJob: YoutubeBatchJob =
+      await supadata.youtube.transcript.batch({
+        videoIds: ['dQw4w9WgXcQ', 'xvFZjo5PgG0'],
+        lang: 'en',
+      });
     console.log('ℹ️ Transcript batch job started:', transcriptBatchJob);
 
     await new Promise((resolve) => setTimeout(resolve, 2000));
@@ -177,19 +182,25 @@ async function main() {
           `ℹ️ [Attempt ${attempts}] Batch job status: ${batchResults.status}`
         );
 
-        if (batchResults.status === 'completed' || batchResults.status === 'failed') {
+        if (
+          batchResults.status === 'completed' ||
+          batchResults.status === 'failed'
+        ) {
           break; // Exit loop if job finished or failed
         }
       } catch (error) {
         console.error(
-          `🛑 [Attempt ${attempts}] Error polling batch results:`, error
+          `🛑 [Attempt ${attempts}] Error polling batch results:`,
+          error
         );
         // Decide if you want to break or continue polling on error
         break;
       }
 
       if (attempts < maxAttempts) {
-        console.log(`ℹ️ Waiting ${pollInterval / 1000} seconds before next poll...`);
+        console.log(
+          `ℹ️ Waiting ${pollInterval / 1000} seconds before next poll...`
+        );
         await new Promise((resolve) => setTimeout(resolve, pollInterval));
       }
     }

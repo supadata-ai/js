@@ -32,7 +32,7 @@ export class Supadata {
   }
 
   /**
-   * Get transcript from a supported video platform (YouTube, TikTok, Twitter) or file URL.
+   * Get transcript from a supported video platform (YouTube, TikTok, Instagram, Twitter) or file URL.
    * If the video is too large to return transcript immediately, request returns a job ID.
    */
   transcript = Object.assign(
