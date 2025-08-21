@@ -10,6 +10,8 @@ import {
   YoutubeTranscriptBatchRequest,
   YoutubeVideo,
   YoutubeVideoBatchRequest,
+  YoutubeSearchParams,
+  YoutubeSearchResponse,
 } from '../types.js';
 
 /**
@@ -81,7 +83,7 @@ export class YouTubeService extends BaseClient {
       batch: async (
         params: YoutubeTranscriptBatchRequest
       ): Promise<YoutubeBatchJob> => {
-        this.validateBatchLimit(params);
+        this.validateLimit(params, 1, 5000, 'batch operation');
         return this.fetch<YoutubeBatchJob>(
           '/youtube/transcript/batch',
           params,
@@ -115,7 +117,7 @@ export class YouTubeService extends BaseClient {
       batch: async (
         params: YoutubeVideoBatchRequest
       ): Promise<YoutubeBatchJob> => {
-        this.validateBatchLimit(params);
+        this.validateLimit(params, 1, 5000, 'batch operation');
         return this.fetch<YoutubeBatchJob>(
           '/youtube/video/batch',
           params,
@@ -224,31 +226,50 @@ export class YouTubeService extends BaseClient {
     );
   };
 
-  private validateLimit(params: { limit?: number }) {
-    if (
-      params.limit != undefined &&
-      params.limit != null &&
-      (params.limit < 1 || params.limit > 5000)
-    ) {
+  /**
+   * Search YouTube for videos, channels, and playlists with advanced filters.
+   * @param params - Parameters for the search
+   * @param params.query - The search query string
+   * @param params.uploadDate - Filter by upload date ("all", "hour", "today", "week", "month", "year")
+   * @param params.type - Filter by content type ("all", "video", "channel", "playlist", "movie")
+   * @param params.duration - Filter video length ("all", "short", "medium", "long")
+   * @param params.sortBy - Sort results by ("relevance", "rating", "date", "views")
+   * @param params.features - Array of special video features
+   * @param params.limit - Maximum results to return
+   * @param params.nextPageToken - Token for pagination
+   * @returns A promise that resolves to a YoutubeSearchResponse object
+   */
+  search = async (
+    params: YoutubeSearchParams
+  ): Promise<YoutubeSearchResponse> => {
+    if (!params.query) {
       throw new SupadataError({
         error: 'invalid-request',
-        message: 'Invalid limit.',
-        details: 'The limit must be between 1 and 5000.',
+        message: 'Missing query parameter',
+        details: 'The query parameter is required for search.',
       });
     }
-  }
 
-  // Add a specific validator for batch limits as per documentation (Max: 5000, Default: 10)
-  private validateBatchLimit(params: { limit?: number }) {
+    this.validateLimit(params, 1, 5000, 'search');
+
+    return this.fetch<YoutubeSearchResponse>('/youtube/search', params);
+  };
+
+  private validateLimit(
+    params: { limit?: number },
+    min: number = 1,
+    max: number = 5000,
+    operation: string = 'operation'
+  ) {
     if (
       params.limit != undefined &&
       params.limit != null &&
-      (params.limit < 1 || params.limit > 5000)
+      (params.limit < min || params.limit > max)
     ) {
       throw new SupadataError({
         error: 'invalid-request',
-        message: 'Invalid limit for batch operation.',
-        details: 'The limit must be between 1 and 5000.',
+        message: `Invalid limit for ${operation}.`,
+        details: `The limit must be between ${min} and ${max}.`,
       });
     }
   }

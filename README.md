@@ -140,6 +140,32 @@ if (batchResults.status === 'completed') {
 } else {
   console.log('Batch job status:', batchResults.status);
 }
+
+// Search YouTube for videos, channels, and playlists
+const searchResults = await supadata.youtube.search({
+  query: 'never gonna give you up',
+  type: 'video', // optional: 'all', 'video', 'channel', 'playlist', 'movie'
+  uploadDate: 'all', // optional: 'all', 'hour', 'today', 'week', 'month', 'year'
+  duration: 'all', // optional: 'all', 'short', 'medium', 'long'
+  sortBy: 'relevance', // optional: 'relevance', 'rating', 'date', 'views'
+  features: ['hd'], // optional: array of special video features
+  limit: 20, // optional: max results (1-5000)
+  nextPageToken: '...', // optional: for pagination
+});
+
+// Search for channels
+const channelSearch = await supadata.youtube.search({
+  query: 'fireship',
+  type: 'channel',
+  limit: 5,
+});
+
+// Search for playlists
+const playlistSearch = await supadata.youtube.search({
+  query: 'javascript tutorials',
+  type: 'playlist',
+  limit: 10,
+});
 ```
 
 ### Web

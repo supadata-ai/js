@@ -1,6 +1,6 @@
 {
   "name": "@supadata/js",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "description": "TypeScript / JavaScript SDK for Supadata API",
   "homepage": "https://supadata.ai",
   "repository": "https://github.com/supadata-ai/js",
@@ -38,6 +38,12 @@
   ],
   "author": "Supadata AI",
   "license": "MIT",
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "cross-fetch": "^4.0.0"
+  },
   "devDependencies": {
     "@types/jest": "^29.5.14",
     "@types/node": "^22.10.10",

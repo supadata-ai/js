@@ -1,3 +1,4 @@
+import fetch from 'cross-fetch';
 import { SupadataConfig, SupadataError } from './types.js';
 // @ts-expect-error: Non-TS import for version from package.json
 import pkg from '../package.json';
@@ -25,7 +26,11 @@ export class BaseClient {
       const queryParams = new URLSearchParams();
       Object.entries(params).forEach(([key, value]) => {
         if (value !== undefined && value !== null) {
-          queryParams.append(key, String(value));
+          if (Array.isArray(value)) {
+            value.forEach((item) => queryParams.append(key, String(item)));
+          } else {
+            queryParams.append(key, String(value));
+          }
         }
       });
       url += `?${queryParams.toString()}`;

@@ -111,21 +111,58 @@ async function main() {
 
     await new Promise((resolve) => setTimeout(resolve, 2000));
 
-    // Example 8: Scrape web content
+    // Example 8: Search YouTube videos
+    console.log('\nℹ️ Searching YouTube videos...');
+    const searchResults = await supadata.youtube.search({
+      query: 'rick astley never gonna give you up',
+      type: 'video',
+      limit: 5,
+      sortBy: 'views',
+    });
+    console.log('ℹ️ Search results:', searchResults);
+
+    await new Promise((resolve) => setTimeout(resolve, 2000));
+
+    // Example 9: Search YouTube with filters
+    console.log('\nℹ️ Searching YouTube with filters...');
+    const filteredSearch = await supadata.youtube.search({
+      query: 'javascript tutorial',
+      type: 'video',
+      uploadDate: 'month',
+      duration: 'medium',
+      sortBy: 'date',
+      limit: 3,
+    });
+    console.log('ℹ️ Filtered search results:', filteredSearch);
+
+    await new Promise((resolve) => setTimeout(resolve, 2000));
+
+    // Example 10: Search YouTube channels
+    console.log('\nℹ️ Searching YouTube channels...');
+    const channelSearch = await supadata.youtube.search({
+      query: 'fireship',
+      type: 'channel',
+      limit: 2,
+    });
+    console.log('ℹ️ Channel search results:', channelSearch);
+
+    await new Promise((resolve) => setTimeout(resolve, 2000));
+
+    // Example 11: Scrape web content
     console.log('\nℹ️ Scraping web content...');
     const webContent = await supadata.web.scrape('https://supadata.ai');
     console.log('ℹ️ Web content:', webContent);
 
     await new Promise((resolve) => setTimeout(resolve, 2000));
 
-    // Example 9: Map website URLs
+    // Example 12: Map website URLs
     console.log('\nℹ️ Mapping website URLs...');
     const siteMap = await supadata.web.map('https://supadata.ai');
     console.log('ℹ️ Site map:', siteMap);
 
     await new Promise((resolve) => setTimeout(resolve, 2000));
 
-    // Example 10: Crawl website with limit
+    // Example 13: Crawl website with limit
     console.log('\nℹ️ Crawling website...');
     const crawl = await supadata.web.crawl({
       url: 'https://supadata.ai',
@@ -135,14 +172,14 @@ async function main() {
 
     await new Promise((resolve) => setTimeout(resolve, 5000));
 
-    // Example 11: Get crawl results
+    // Example 14: Get crawl results
     console.log('\nℹ️ Getting crawl results...');
     const crawlResults = await supadata.web.getCrawlResults(crawl.jobId);
     console.log('ℹ️ Crawl results:', crawlResults);
 
     await new Promise((resolve) => setTimeout(resolve, 2000));
 
-    // Example 12: Start YouTube transcript batch job
+    // Example 15: Start YouTube transcript batch job
     console.log('\nℹ️ Starting YouTube transcript batch job...');
     const transcriptBatchJob: YoutubeBatchJob =
       await supadata.youtube.transcript.batch({
@@ -153,7 +190,7 @@ async function main() {
 
     await new Promise((resolve) => setTimeout(resolve, 2000));
 
-    // Example 13: Start YouTube video metadata batch job
+    // Example 16: Start YouTube video metadata batch job
     console.log('\nℹ️ Starting YouTube video metadata batch job...');
     const videoBatchJob: YoutubeBatchJob = await supadata.youtube.video.batch({
       playlistId: 'PLlaN88a7y2_plecYoJxvRFTLHVbIVAOoc', // Example playlist
@@ -163,7 +200,7 @@ async function main() {
 
     await new Promise((resolve) => setTimeout(resolve, 2000));
 
-    // Example 14: Poll and get batch results (using transcript job ID from Ex 12)
+    // Example 17: Poll and get batch results (using transcript job ID from Ex 15)
     console.log(
       `\nℹ️ Polling for batch results for job: ${transcriptBatchJob.jobId}...`
     );
@@ -222,10 +259,15 @@ async function main() {
       console.error('\n🛑 Could not retrieve final batch job status.');
     }
   } catch (error) {
-    console.error('🛑 An unexpected error occurred in main:', error);
     if (error instanceof SupadataError) {
-      console.error('   Error Code:', error.error);
-      console.error('   Details:', error.details);
+      console.error(
+        '🛑 Supadata Error Code:',
+        error.error,
+        'Details:',
+        error.details
+      );
+    } else {
+      console.error('🛑 An unexpected error occurred:', error);
     }
   }
 }

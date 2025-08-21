@@ -166,3 +166,82 @@ export interface JobResult<T = any> {
     documentationUrl?: string;
   } | null;
 }
+
+// YouTube Search Types
+export type YoutubeSearchUploadDate =
+  | 'all'
+  | 'hour'
+  | 'today'
+  | 'week'
+  | 'month'
+  | 'year';
+export type YoutubeSearchType =
+  | 'all'
+  | 'video'
+  | 'channel'
+  | 'playlist'
+  | 'movie';
+export type YoutubeSearchDuration = 'all' | 'short' | 'medium' | 'long';
+export type YoutubeSearchSortBy = 'relevance' | 'rating' | 'date' | 'views';
+
+export interface YoutubeSearchParams {
+  query: string;
+  uploadDate?: YoutubeSearchUploadDate;
+  type?: YoutubeSearchType;
+  duration?: YoutubeSearchDuration;
+  sortBy?: YoutubeSearchSortBy;
+  features?: string[];
+  limit?: number;
+  nextPageToken?: string;
+}
+
+export interface YoutubeSearchVideoResult {
+  type: 'video';
+  id: string;
+  title: string;
+  description: string;
+  thumbnail: string;
+  duration: number;
+  viewCount: number;
+  uploadDate: string;
+  channel: {
+    id: string;
+    name: string;
+  };
+}
+
+export interface YoutubeSearchChannelResult {
+  type: 'channel';
+  id: string;
+  name: string;
+  handle: string;
+  description: string;
+  thumbnail: string;
+  subscriberCount: number;
+  videoCount: number;
+}
+
+export interface YoutubeSearchPlaylistResult {
+  type: 'playlist';
+  id: string;
+  title: string;
+  description: string;
+  thumbnail: string;
+  videoCount: number;
+  channel: {
+    id: string;
+    name: string;
+  };
+}
+
+export type YoutubeSearchResult =
+  | YoutubeSearchVideoResult
+  | YoutubeSearchChannelResult
+  | YoutubeSearchPlaylistResult;
+
+export interface YoutubeSearchResponse {
+  query: string;
+  results: YoutubeSearchResult[];
+  totalResults: number;
+  nextPageToken?: string;
+}
