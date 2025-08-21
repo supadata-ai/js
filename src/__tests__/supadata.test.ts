@@ -13,6 +13,7 @@ import type {
   YoutubeChannel,
   YoutubePlaylist,
   YoutubeVideo,
+  YoutubeSearchResponse,
 } from '../types.js';
 
 fetchMock.enableMocks();
@@ -554,6 +555,196 @@ describe('Supadata SDK', () => {
         await expect(
           supadata.youtube.batch.getBatchResults('')
         ).rejects.toThrow('Missing jobId');
+        expect(fetchMock).not.toHaveBeenCalled();
+      });
+    });
+
+    describe('search', () => {
+      it('should search YouTube with query only', async () => {
+        const mockResponse: YoutubeSearchResponse = {
+          query: 'rick astley never gonna give you up',
+          results: [
+            {
+              type: 'video',
+              id: 'dQw4w9WgXcQ',
+              title: 'Rick Astley - Never Gonna Give You Up (Official Video)',
+              description:
+                'The official video for "Never Gonna Give You Up" by Rick Astley...',
+              thumbnail: 'https://i.ytimg.com/vi/dQw4w9WgXcQ/maxresdefault.jpg',
+              duration: 213,
+              viewCount: 1400000000,
+              uploadDate: '2009-10-25T00:00:00.000Z',
+              channel: {
+                id: 'UCuAXFkgsw1L7xaCfnd5JJOw',
+                name: 'Rick Astley',
+              },
+            },
+          ],
+          totalResults: 1000,
+          nextPageToken: 'CAoQAA',
+        };
+
+        fetchMock.mockResponseOnce(JSON.stringify(mockResponse), {
+          headers: { 'content-type': 'application/json' },
+        });
+
+        const result = await supadata.youtube.search({
+          query: 'rick astley never gonna give you up',
+        });
+
+        expect(result).toEqual(mockResponse);
+        expect(fetchMock).toHaveBeenCalledWith(
+          'https://api.supadata.ai/v1/youtube/search?query=rick+astley+never+gonna+give+you+up',
+          expect.objectContaining({
+            method: 'GET',
+            headers: expect.objectContaining({
+              'x-api-key': 'test-api-key',
+              'Content-Type': 'application/json',
+              'User-Agent': expect.stringContaining('supadata-js'),
+            }),
+          })
+        );
+      });
+
+      it('should search YouTube with all filters', async () => {
+        const mockResponse: YoutubeSearchResponse = {
+          query: 'programming tutorial',
+          results: [
+            {
+              type: 'video',
+              id: 'abc123',
+              title: 'Python Programming Tutorial',
+              description: 'Learn Python programming...',
+              thumbnail: 'https://i.ytimg.com/vi/abc123/maxresdefault.jpg',
+              duration: 600,
+              viewCount: 100000,
+              uploadDate: '2024-01-01T00:00:00.000Z',
+              channel: {
+                id: 'channel123',
+                name: 'Tech Channel',
+              },
+            },
+          ],
+          totalResults: 500,
+          nextPageToken: 'CDIQAA',
+        };
+
+        fetchMock.mockResponseOnce(JSON.stringify(mockResponse), {
+          headers: { 'content-type': 'application/json' },
+        });
+
+        const result = await supadata.youtube.search({
+          query: 'programming tutorial',
+          type: 'video',
+          uploadDate: 'month',
+          duration: 'medium',
+          sortBy: 'views',
+          limit: 20,
+          features: ['HD', 'Subtitles'],
+          nextPageToken: 'CAoQAA',
+        });
+
+        expect(result).toEqual(mockResponse);
+        expect(fetchMock).toHaveBeenCalledWith(
+          'https://api.supadata.ai/v1/youtube/search?query=programming+tutorial&type=video&uploadDate=month&duration=medium&sortBy=views&limit=20&features=HD&features=Subtitles&nextPageToken=CAoQAA',
+          expect.objectContaining({
+            method: 'GET',
+            headers: expect.objectContaining({
+              'x-api-key': 'test-api-key',
+              'Content-Type': 'application/json',
+              'User-Agent': expect.stringContaining('supadata-js'),
+            }),
+          })
+        );
+      });
+
+      it('should search and return channel results', async () => {
+        const mockResponse: YoutubeSearchResponse = {
+          query: 'fireship',
+          results: [
+            {
+              type: 'channel',
+              id: 'UCsBjURrPoezykLs9EqgamOA',
+              name: 'Fireship',
+              handle: '@Fireship',
+              description:
+                'High-intensity code tutorials to help you build & ship your app faster...',
+              thumbnail:
+                'https://yt3.googleusercontent.com/ytc/channel_thumbnail',
+              subscriberCount: 2000000,
+              videoCount: 500,
+            },
+          ],
+          totalResults: 10,
+        };
+
+        fetchMock.mockResponseOnce(JSON.stringify(mockResponse), {
+          headers: { 'content-type': 'application/json' },
+        });
+
+        const result = await supadata.youtube.search({
+          query: 'fireship',
+          type: 'channel',
+        });
+
+        expect(result).toEqual(mockResponse);
+      });
+
+      it('should search and return playlist results', async () => {
+        const mockResponse: YoutubeSearchResponse = {
+          query: 'javascript tutorials',
+          results: [
+            {
+              type: 'playlist',
+              id: 'PLrAXtmErZgOdP_8GztsuRmjqMA_WbZkrH',
+              title: 'JavaScript Full Course',
+              description: 'Complete JavaScript tutorial playlist...',
+              thumbnail:
+                'https://i.ytimg.com/vi/playlist_thumbnail/maxresdefault.jpg',
+              videoCount: 50,
+              channel: {
+                id: 'channel456',
+                name: 'Code Academy',
+              },
+            },
+          ],
+          totalResults: 100,
+        };
+
+        fetchMock.mockResponseOnce(JSON.stringify(mockResponse), {
+          headers: { 'content-type': 'application/json' },
+        });
+
+        const result = await supadata.youtube.search({
+          query: 'javascript tutorials',
+          type: 'playlist',
+        });
+
+        expect(result).toEqual(mockResponse);
+      });
+
+      it('should throw error when query is missing', async () => {
+        await expect(supadata.youtube.search({} as any)).rejects.toThrow(
+          'Missing query parameter'
+        );
+        expect(fetchMock).not.toHaveBeenCalled();
+      });
+
+      it('should throw error when limit is invalid', async () => {
+        await expect(
+          supadata.youtube.search({
+            query: 'test',
+            limit: 150,
+          })
+        ).rejects.toThrow('Invalid limit for search');
+        expect(fetchMock).not.toHaveBeenCalled();
+
+        await expect(
+          supadata.youtube.search({
+            query: 'test',
+            limit: 0,
+          })
+        ).rejects.toThrow('Invalid limit for search');
         expect(fetchMock).not.toHaveBeenCalled();
       });
     });
