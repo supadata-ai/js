@@ -2,8 +2,6 @@ import { Supadata } from '../index.js';
 import { SupadataError } from '../types.js';
 import fetchMock from 'jest-fetch-mock';
 
-fetchMock.enableMocks();
-
 describe('Error Handling', () => {
   const config = {
     apiKey: 'test-api-key',

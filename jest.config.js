@@ -14,4 +14,5 @@ export default {
       },
     ],
   },
+  setupFilesAfterEnv: ["<rootDir>/src/__tests__/setup.js"],
 };

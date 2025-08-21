@@ -16,8 +16,6 @@ import type {
   YoutubeSearchResponse,
 } from '../types.js';
 
-fetchMock.enableMocks();
-
 describe('Supadata SDK', () => {
   const config = {
     apiKey: 'test-api-key',
@@ -272,15 +270,15 @@ describe('Supadata SDK', () => {
     it('should throw an error with invalid limit', async () => {
       await expect(
         supadata.youtube.channel.videos({ id: 'test-id', limit: 0 })
-      ).rejects.toThrow('Invalid limit.');
+      ).rejects.toThrow('Invalid limit for operation.');
 
       await expect(
         supadata.youtube.channel.videos({ id: 'test-id', limit: -1 })
-      ).rejects.toThrow('Invalid limit.');
+      ).rejects.toThrow('Invalid limit for operation.');
 
       await expect(
         supadata.youtube.channel.videos({ id: 'test-id', limit: 10000 })
-      ).rejects.toThrow('Invalid limit.');
+      ).rejects.toThrow('Invalid limit for operation.');
     });
 
     it('should get the playlist info', async () => {
@@ -409,15 +407,15 @@ describe('Supadata SDK', () => {
     it('should throw an error with invalid limit', async () => {
       await expect(
         supadata.youtube.playlist.videos({ id: 'test-id', limit: 0 })
-      ).rejects.toThrow('Invalid limit.');
+      ).rejects.toThrow('Invalid limit for operation.');
 
       await expect(
         supadata.youtube.playlist.videos({ id: 'test-id', limit: -1 })
-      ).rejects.toThrow('Invalid limit.');
+      ).rejects.toThrow('Invalid limit for operation.');
 
       await expect(
         supadata.youtube.playlist.videos({ id: 'test-id', limit: 10000 })
-      ).rejects.toThrow('Invalid limit.');
+      ).rejects.toThrow('Invalid limit for operation.');
     });
 
     describe('Transcript Batch', () => {
@@ -734,9 +732,9 @@ describe('Supadata SDK', () => {
         await expect(
           supadata.youtube.search({
             query: 'test',
-            limit: 150,
+            limit: 10000,
           })
-        ).rejects.toThrow('Invalid limit for search');
+        ).rejects.toThrow('Invalid limit for search.');
         expect(fetchMock).not.toHaveBeenCalled();
 
         await expect(
@@ -744,7 +742,7 @@ describe('Supadata SDK', () => {
             query: 'test',
             limit: 0,
           })
-        ).rejects.toThrow('Invalid limit for search');
+        ).rejects.toThrow('Invalid limit for search.');
         expect(fetchMock).not.toHaveBeenCalled();
       });
     });
