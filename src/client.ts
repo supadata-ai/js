@@ -1,4 +1,4 @@
-import fetch from 'cross-fetch';
+import fetch from './polly-fetch';
 import { SupadataConfig, SupadataError } from './types.js';
 // @ts-expect-error: Non-TS import for version from package.json
 import pkg from '../package.json';
