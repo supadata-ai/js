@@ -23,6 +23,7 @@ import {
   CrawlJob,
   JobResult,
   Map,
+  Metadata,
   Scrape,
   Supadata,
   Transcript,
@@ -36,6 +37,18 @@ import {
 const supadata = new Supadata({
   apiKey: 'YOUR_API_KEY',
 });
+```
+
+### Metadata
+
+```typescript
+// Get media metadata from any supported platform (YouTube, TikTok, Instagram, Twitter)
+const metadata = await supadata.metadata({
+  url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+});
+
+// The metadata object contains comprehensive information about the media
+console.log(metadata);
 ```
 
 ### Transcripts
@@ -74,20 +87,10 @@ if ('jobId' in transcriptResult) {
 ### YouTube
 
 ```typescript
-// Get YouTube transcript
-const transcript: Transcript = await supadata.youtube.transcript({
-  url: 'https://youtu.be/dQw4w9WgXcQ',
-});
-
 // Translate YouTube transcript
 const translated: Transcript = await supadata.youtube.translate({
   videoId: 'dQw4w9WgXcQ',
   lang: 'es',
-});
-
-// Get a YouTube Video metadata
-const video: YoutubeVideo = await supadata.youtube.video({
-  id: 'dQw4w9WgXcQ', // can be url or video id
 });
 
 // Get a YouTube channel metadata

@@ -1,6 +1,6 @@
 {
   "name": "supadata-example",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Example usage of Supadata SDK",
   "type": "module",
   "scripts": {

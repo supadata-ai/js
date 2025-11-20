@@ -1,5 +1,6 @@
 import {
   JobResult,
+  Metadata,
   SupadataConfig,
   Transcript,
   TranscriptOrJobId,
@@ -10,6 +11,7 @@ import {
   TranscriptService,
   GeneralTranscriptParams,
 } from './services/transcript.js';
+import { BaseClient } from './client.js';
 
 export * from './types.js';
 export * from './client.js';
@@ -20,12 +22,17 @@ export {
   GeneralTranscriptParams,
 } from './services/transcript.js';
 
-export class Supadata {
+export interface MetadataParams {
+  url: string;
+}
+
+export class Supadata extends BaseClient {
   readonly youtube: YouTubeService;
   readonly web: WebService;
   private _transcriptService: TranscriptService;
 
   constructor(config: SupadataConfig) {
+    super(config);
     this.youtube = new YouTubeService(config);
     this.web = new WebService(config);
     this._transcriptService = new TranscriptService(config);
@@ -45,4 +52,14 @@ export class Supadata {
       },
     }
   );
+
+  /**
+   * Get metadata from any supported platform (YouTube, TikTok, Instagram, Twitter).
+   * @param params - Parameters for fetching metadata
+   * @param params.url - Media URL from YouTube, TikTok, Instagram, or Twitter
+   * @returns A promise that resolves to a Metadata object
+   */
+  metadata = async (params: MetadataParams): Promise<Metadata> => {
+    return this.fetch<Metadata>('/metadata', params);
+  };
 }

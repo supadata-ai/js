@@ -56,6 +56,7 @@ export interface VideoIds {
 export class YouTubeService extends BaseClient {
   /**
    * Handles YouTube Transcript operations.
+   * @deprecated Use `supadata.transcript()` instead for multi-platform support
    */
   transcript = Object.assign(
     /**
@@ -66,6 +67,7 @@ export class YouTubeService extends BaseClient {
      * @param params.lang - The language code for the transcript (optional)
      * @param params.text - Whether to return only the text content (optional)
      * @returns A promise that resolves to a Transcript object
+     * @deprecated Use `supadata.transcript()` instead for multi-platform support
      */
     async (params: TranscriptParams): Promise<Transcript> => {
       return this.fetch<Transcript>('/youtube/transcript', params);
@@ -95,6 +97,7 @@ export class YouTubeService extends BaseClient {
 
   /**
    * Handles YouTube video operations.
+   * @deprecated Use `supadata.metadata()` instead for multi-platform support
    */
   video = Object.assign(
     /**
@@ -102,6 +105,7 @@ export class YouTubeService extends BaseClient {
      * @param params - The parameters required to fetch the YouTube video
      * @param params.id - The YouTube video ID
      * @returns A promise that resolves to a YoutubeVideo object
+     * @deprecated Use `supadata.metadata()` instead for multi-platform support
      */
     async (params: ResourceParams): Promise<YoutubeVideo> => {
       return this.fetch<YoutubeVideo>('/youtube/video', params);

@@ -15,17 +15,26 @@ async function main() {
       apiKey: API_KEY,
     });
 
-    // Example 1: Get YouTube transcript
-    console.log('\nℹ️ Getting YouTube transcript...');
-    const transcript = await supadata.youtube.transcript({
-      videoId: 'dQw4w9WgXcQ', // Famous Rick Astley video as an example
+    // Example 1: Get metadata from any platform
+    console.log('\nℹ️ Getting metadata from YouTube...');
+    const youtubeMetadata = await supadata.metadata({
+      url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
     });
-    console.log('ℹ️ Transcript:', transcript);
+    console.log('ℹ️ YouTube Metadata:', youtubeMetadata);
 
     await new Promise((resolve) => setTimeout(resolve, 2000));
 
-    // Example 2: Get transcript from any platform (YouTube, TikTok, Instagram, Twitter) or file
-    console.log('\nℹ️ Getting transcript from any platform...');
+    // Example 2: Get metadata from TikTok
+    console.log('\nℹ️ Getting metadata from TikTok...');
+    const tiktokMetadata = await supadata.metadata({
+      url: 'https://www.tiktok.com/@subwaytakes/video/7520266642375331103',
+    });
+    console.log('ℹ️ TikTok Metadata:', tiktokMetadata);
+
+    await new Promise((resolve) => setTimeout(resolve, 2000));
+
+    // Example 3: Get transcript from any platform (YouTube, TikTok, Instagram, Twitter) or file
+    console.log('\nℹ️ Getting transcript from YouTube...');
     const transcriptResult = await supadata.transcript({
       url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
       lang: 'en',
@@ -63,15 +72,6 @@ async function main() {
     } else {
       console.log('ℹ️ Got transcript directly:', transcriptResult);
     }
-
-    await new Promise((resolve) => setTimeout(resolve, 2000));
-
-    // Example 3: Get YouTube video info
-    console.log('\nℹ️ Getting YouTube video info...');
-    const videoInfo = await supadata.youtube.video({
-      id: 'dQw4w9WgXcQ', // Famous Rick Astley video as an example
-    });
-    console.log('ℹ️ Video info:', videoInfo);
 
     await new Promise((resolve) => setTimeout(resolve, 2000));
 
@@ -200,7 +200,7 @@ async function main() {
 
     await new Promise((resolve) => setTimeout(resolve, 2000));
 
-    // Example 17: Poll and get batch results (using transcript job ID from Ex 15)
+    // Example 17: Poll and get batch results (using transcript job ID from Example 15)
     console.log(
       `\nℹ️ Polling for batch results for job: ${transcriptBatchJob.jobId}...`
     );

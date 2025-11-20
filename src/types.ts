@@ -245,3 +245,64 @@ export interface YoutubeSearchResponse {
   totalResults: number;
   nextPageToken?: string;
 }
+
+// Metadata Types
+export type MetadataPlatform = 'youtube' | 'tiktok' | 'instagram' | 'twitter';
+export type MetadataType = 'video' | 'image' | 'carousel' | 'post';
+
+export interface MetadataAuthor {
+  username: string;
+  displayName: string;
+  avatarUrl: string;
+  verified: boolean;
+}
+
+export interface MetadataStats {
+  views: number | null;
+  likes: number | null;
+  comments: number | null;
+  shares: number | null;
+}
+
+export interface VideoMedia {
+  type: 'video';
+  url: string;
+  duration: number;
+  width: number;
+  height: number;
+  thumbnailUrl: string;
+}
+
+export interface ImageMedia {
+  type: 'image';
+  url: string;
+  width: number;
+  height: number;
+}
+
+export interface CarouselMedia {
+  type: 'carousel';
+  items: Array<VideoMedia | ImageMedia>;
+}
+
+export interface PostMedia {
+  type: 'post';
+  text: string;
+}
+
+export type Media = VideoMedia | ImageMedia | CarouselMedia | PostMedia;
+
+export interface Metadata {
+  platform: MetadataPlatform;
+  type: MetadataType;
+  id: string;
+  url: string;
+  title: string | null;
+  description: string | null;
+  author: MetadataAuthor;
+  stats: MetadataStats;
+  media: Media;
+  tags: string[];
+  createdAt: string;
+  additionalData: Record<string, any>;
+}
