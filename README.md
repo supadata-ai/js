@@ -21,6 +21,8 @@ npm install @supadata/js
 import {
   Crawl,
   CrawlJob,
+  ExtractJobResult,
+  JobId,
   JobResult,
   Map,
   Metadata,
@@ -81,6 +83,43 @@ if ('jobId' in transcriptResult) {
 } else {
   // For smaller files, we get the transcript directly
   console.log('Transcript:', transcriptResult);
+}
+```
+
+### Extract
+
+```typescript
+// Extract structured data from video content using AI
+// With a prompt (AI determines the schema)
+const job = await supadata.extract({
+  url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+  prompt: 'Extract the main topics and key takeaways',
+});
+console.log(`Started extract job: ${job.jobId}`);
+
+// With a JSON Schema (for structured output)
+const jobWithSchema = await supadata.extract({
+  url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+  schema: {
+    type: 'object',
+    properties: {
+      topics: { type: 'array', items: { type: 'string' } },
+      summary: { type: 'string' },
+    },
+    required: ['topics', 'summary'],
+  },
+});
+
+// Poll for results
+const result = await supadata.extract.getResults(job.jobId);
+if (result.status === 'completed') {
+  console.log('Extracted data:', result.data);
+  // If no schema was provided, the AI-generated schema is available:
+  console.log('Generated schema:', result.schema);
+} else if (result.status === 'failed') {
+  console.error('Extract failed:', result.error);
+} else {
+  console.log('Job status:', result.status); // 'queued' or 'active'
 }
 ```
 
