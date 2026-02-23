@@ -2,6 +2,7 @@ import fetchMock from 'jest-fetch-mock';
 import { Supadata } from '../index.js';
 import type {
   CrawlJob,
+  ExtractJobResult,
   JobId,
   JobResult,
   Metadata,
@@ -1207,6 +1208,233 @@ describe('Supadata SDK', () => {
           url: 'https://www.youtube.com/watch?v=INVALID',
         })
       ).rejects.toThrow('The requested item could not be found');
+    });
+  });
+
+  describe('Extract Service', () => {
+    it('should start extract job with prompt', async () => {
+      const mockResponse: JobId = {
+        jobId: '123e4567-e89b-12d3-a456-426614174000',
+      };
+
+      fetchMock.mockResponseOnce(JSON.stringify(mockResponse), {
+        headers: { 'content-type': 'application/json' },
+      });
+
+      const result = await supadata.extract({
+        url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+        prompt: 'Extract the main topics and key takeaways',
+      });
+
+      expect(result).toEqual(mockResponse);
+      expect(fetchMock).toHaveBeenCalledWith(
+        'https://api.supadata.ai/v1/extract',
+        expect.objectContaining({
+          method: 'POST',
+          headers: expect.objectContaining({
+            'x-api-key': 'test-api-key',
+            'Content-Type': 'application/json',
+            'User-Agent': expect.stringContaining('supadata-js'),
+          }),
+          body: JSON.stringify({
+            url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+            prompt: 'Extract the main topics and key takeaways',
+          }),
+        })
+      );
+    });
+
+    it('should start extract job with schema', async () => {
+      const mockResponse: JobId = {
+        jobId: '123e4567-e89b-12d3-a456-426614174001',
+      };
+      const schema = {
+        type: 'object',
+        properties: {
+          topics: { type: 'array', items: { type: 'string' } },
+          summary: { type: 'string' },
+        },
+        required: ['topics', 'summary'],
+      };
+
+      fetchMock.mockResponseOnce(JSON.stringify(mockResponse), {
+        headers: { 'content-type': 'application/json' },
+      });
+
+      const result = await supadata.extract({
+        url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+        schema,
+      });
+
+      expect(result).toEqual(mockResponse);
+      expect(fetchMock).toHaveBeenCalledWith(
+        'https://api.supadata.ai/v1/extract',
+        expect.objectContaining({
+          method: 'POST',
+          body: JSON.stringify({
+            url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+            schema,
+          }),
+        })
+      );
+    });
+
+    it('should start extract job with prompt and schema', async () => {
+      const mockResponse: JobId = {
+        jobId: '123e4567-e89b-12d3-a456-426614174002',
+      };
+      const schema = {
+        type: 'object',
+        properties: {
+          topics: { type: 'array', items: { type: 'string' } },
+        },
+      };
+
+      fetchMock.mockResponseOnce(JSON.stringify(mockResponse), {
+        headers: { 'content-type': 'application/json' },
+      });
+
+      const result = await supadata.extract({
+        url: 'https://www.tiktok.com/@user/video/1234567890',
+        prompt: 'Extract the main topics',
+        schema,
+      });
+
+      expect(result).toEqual(mockResponse);
+      expect(fetchMock).toHaveBeenCalledWith(
+        'https://api.supadata.ai/v1/extract',
+        expect.objectContaining({
+          method: 'POST',
+          body: JSON.stringify({
+            url: 'https://www.tiktok.com/@user/video/1234567890',
+            prompt: 'Extract the main topics',
+            schema,
+          }),
+        })
+      );
+    });
+
+    it('should get extract results when job is completed', async () => {
+      const jobId = '123e4567-e89b-12d3-a456-426614174000';
+      const mockResponse: ExtractJobResult = {
+        status: 'completed',
+        error: null,
+        data: {
+          topics: ['AI basics', 'Machine learning'],
+          summary: 'An introduction to artificial intelligence',
+        },
+      };
+
+      fetchMock.mockResponseOnce(JSON.stringify(mockResponse), {
+        headers: { 'content-type': 'application/json' },
+      });
+
+      const result = await supadata.extract.getResults(jobId);
+
+      expect(result).toEqual(mockResponse);
+      expect(fetchMock).toHaveBeenCalledWith(
+        `https://api.supadata.ai/v1/extract/${jobId}`,
+        expect.objectContaining({
+          method: 'GET',
+          headers: expect.objectContaining({
+            'x-api-key': 'test-api-key',
+            'Content-Type': 'application/json',
+            'User-Agent': expect.stringContaining('supadata-js'),
+          }),
+        })
+      );
+    });
+
+    it('should get extract results with AI-generated schema', async () => {
+      const jobId = '123e4567-e89b-12d3-a456-426614174003';
+      const mockResponse: ExtractJobResult = {
+        status: 'completed',
+        error: null,
+        data: {
+          topics: ['Neural networks'],
+          summary: 'Deep learning overview',
+        },
+        schema: {
+          type: 'object',
+          properties: {
+            topics: { type: 'array', items: { type: 'string' } },
+            summary: { type: 'string' },
+          },
+          required: ['topics', 'summary'],
+        },
+      };
+
+      fetchMock.mockResponseOnce(JSON.stringify(mockResponse), {
+        headers: { 'content-type': 'application/json' },
+      });
+
+      const result = await supadata.extract.getResults(jobId);
+
+      expect(result).toEqual(mockResponse);
+      expect(result.schema).toBeDefined();
+      expect(result.data).toBeDefined();
+    });
+
+    it('should get extract results when job is still active', async () => {
+      const jobId = '123e4567-e89b-12d3-a456-426614174004';
+      const mockResponse: ExtractJobResult = {
+        status: 'active',
+      };
+
+      fetchMock.mockResponseOnce(JSON.stringify(mockResponse), {
+        headers: { 'content-type': 'application/json' },
+      });
+
+      const result = await supadata.extract.getResults(jobId);
+
+      expect(result).toEqual(mockResponse);
+      expect(result.status).toBe('active');
+    });
+
+    it('should get extract results when job failed', async () => {
+      const jobId = '123e4567-e89b-12d3-a456-426614174005';
+      const mockResponse: ExtractJobResult = {
+        status: 'failed',
+        error: {
+          error: 'internal-error',
+          message: 'Extract failed',
+          details: 'Failed to process the video',
+        },
+      };
+
+      fetchMock.mockResponseOnce(JSON.stringify(mockResponse), {
+        headers: { 'content-type': 'application/json' },
+      });
+
+      const result = await supadata.extract.getResults(jobId);
+
+      expect(result).toEqual(mockResponse);
+      expect(result.status).toBe('failed');
+      expect(result.error).toBeDefined();
+    });
+
+    it('should throw error when getting results with no jobId', async () => {
+      await expect(supadata.extract.getResults('')).rejects.toThrow(
+        'Missing jobId'
+      );
+      expect(fetchMock).not.toHaveBeenCalled();
+    });
+
+    it('should handle API errors', async () => {
+      const mockResponse = {
+        error: 'not-found',
+        message: 'Job not found',
+        details: 'The specified job could not be found',
+      };
+
+      fetchMock.mockResponseOnce(JSON.stringify(mockResponse), {
+        status: 404,
+        headers: { 'content-type': 'application/json' },
+      });
+
+      await expect(
+        supadata.extract.getResults('invalid-job-id')
+      ).rejects.toThrow('Job not found');
     });
   });
 });

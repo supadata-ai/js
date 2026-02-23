@@ -306,3 +306,22 @@ export interface Metadata {
   createdAt: string;
   additionalData: Record<string, any>;
 }
+
+// Extract Types
+export interface ExtractParams {
+  url: string;
+  prompt?: string;
+  schema?: Record<string, any>;
+}
+
+export interface ExtractJobResult {
+  status: JobStatus;
+  error?: {
+    error: SupadataError['error'];
+    message: string;
+    details: string;
+    documentationUrl?: string;
+  } | null;
+  data?: Record<string, any>;
+  schema?: Record<string, any>;
+}

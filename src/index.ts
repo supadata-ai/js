@@ -1,4 +1,7 @@
 import {
+  ExtractJobResult,
+  ExtractParams,
+  JobId,
   JobResult,
   Metadata,
   SupadataConfig,
@@ -11,6 +14,7 @@ import {
   TranscriptService,
   GeneralTranscriptParams,
 } from './services/transcript.js';
+import { ExtractService } from './services/extract.js';
 import { BaseClient } from './client.js';
 
 export * from './types.js';
@@ -21,6 +25,7 @@ export {
   TranscriptService,
   GeneralTranscriptParams,
 } from './services/transcript.js';
+export { ExtractService } from './services/extract.js';
 
 export interface MetadataParams {
   url: string;
@@ -30,12 +35,14 @@ export class Supadata extends BaseClient {
   readonly youtube: YouTubeService;
   readonly web: WebService;
   private _transcriptService: TranscriptService;
+  private _extractService: ExtractService;
 
   constructor(config: SupadataConfig) {
     super(config);
     this.youtube = new YouTubeService(config);
     this.web = new WebService(config);
     this._transcriptService = new TranscriptService(config);
+    this._extractService = new ExtractService(config);
   }
 
   /**
@@ -62,4 +69,20 @@ export class Supadata extends BaseClient {
   metadata = async (params: MetadataParams): Promise<Metadata> => {
     return this.fetch<Metadata>('/metadata', params);
   };
+
+  /**
+   * Extract structured data from video content using AI.
+   * Returns a job ID for asynchronous processing.
+   * Use extract.getResults(jobId) to poll for results.
+   */
+  extract = Object.assign(
+    async (params: ExtractParams): Promise<JobId> => {
+      return this._extractService.get(params);
+    },
+    {
+      getResults: (jobId: string): Promise<ExtractJobResult> => {
+        return this._extractService.getResults(jobId);
+      },
+    }
+  );
 }
