@@ -699,6 +699,32 @@ describe('Supadata SDK', () => {
       );
     });
 
+    it('should scrape web content with options', async () => {
+      const mockResponse: Scrape = {
+        url: 'https://supadata.ai',
+        content: '# Title',
+        name: 'Example',
+        description: 'Test page',
+        ogUrl: 'https://supadata.ai/og.png',
+        countCharacters: 100,
+        urls: [],
+      };
+
+      fetchMock.mockResponseOnce(JSON.stringify(mockResponse), {
+        headers: { 'content-type': 'application/json' },
+      });
+
+      const result = await supadata.web.scrape('https://supadata.ai', {
+        noLinks: true,
+        lang: 'de',
+      });
+      expect(result).toEqual(mockResponse);
+      expect(fetchMock).toHaveBeenCalledWith(
+        'https://api.supadata.ai/v1/web/scrape?url=https%3A%2F%2Fsupadata.ai&noLinks=true&lang=de',
+        expect.objectContaining({ method: 'GET' })
+      );
+    });
+
     it('should map website', async () => {
       const mockResponse: SiteMap = {
         urls: ['https://supadata.ai', 'https://supadata.ai/docs'],
