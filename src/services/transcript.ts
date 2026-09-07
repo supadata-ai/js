@@ -40,6 +40,22 @@ export class TranscriptService extends BaseClient {
           'The jobId parameter is required to get transcript job status.',
       });
     }
-    return this.fetch<JobResult<Transcript>>(`/transcript/${jobId}`);
+    const response = await this.fetch<
+      JobResult<Transcript> & Partial<Transcript>
+    >(`/transcript/${jobId}`);
+
+    // The API returns the transcript fields (content, lang, availableLangs)
+    // at the top level of a completed job response. Normalise them into
+    // `result` so callers can rely on the JobResult<Transcript> contract.
+    if (response.result === undefined && response.content !== undefined) {
+      const { status, error, content, lang, availableLangs } = response;
+      return {
+        status,
+        error,
+        result: { content, lang, availableLangs } as Transcript,
+      };
+    }
+
+    return response;
   };
 }

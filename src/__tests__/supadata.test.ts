@@ -884,6 +884,30 @@ describe('Supadata SDK', () => {
       );
     });
 
+    it('should normalise a flat completed job response into result', async () => {
+      const jobId = '123e4567-e89b-12d3-a456-426614174009';
+      const apiResponse = {
+        status: 'completed',
+        content: [{ text: 'Hello', offset: 0, duration: 1000, lang: 'en' }],
+        lang: 'en',
+        availableLangs: ['en', 'es'],
+      };
+
+      fetchMock.mockResponseOnce(JSON.stringify(apiResponse), {
+        headers: { 'content-type': 'application/json' },
+      });
+
+      const result = await supadata.transcript.getJobStatus(jobId);
+
+      expect(result.status).toBe('completed');
+      expect(result.result).toEqual({
+        content: apiResponse.content,
+        lang: 'en',
+        availableLangs: ['en', 'es'],
+      });
+      expect((result as any).content).toBeUndefined();
+    });
+
     it('should get job status when job is still active', async () => {
       const jobId = '123e4567-e89b-12d3-a456-426614174001';
       const mockResponse: JobResult<Transcript> = {
