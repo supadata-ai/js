@@ -699,6 +699,32 @@ describe('Supadata SDK', () => {
       );
     });
 
+    it('should scrape web content with options', async () => {
+      const mockResponse: Scrape = {
+        url: 'https://supadata.ai',
+        content: '# Title',
+        name: 'Example',
+        description: 'Test page',
+        ogUrl: 'https://supadata.ai/og.png',
+        countCharacters: 100,
+        urls: [],
+      };
+
+      fetchMock.mockResponseOnce(JSON.stringify(mockResponse), {
+        headers: { 'content-type': 'application/json' },
+      });
+
+      const result = await supadata.web.scrape('https://supadata.ai', {
+        noLinks: true,
+        lang: 'de',
+      });
+      expect(result).toEqual(mockResponse);
+      expect(fetchMock).toHaveBeenCalledWith(
+        'https://api.supadata.ai/v1/web/scrape?url=https%3A%2F%2Fsupadata.ai&noLinks=true&lang=de',
+        expect.objectContaining({ method: 'GET' })
+      );
+    });
+
     it('should map website', async () => {
       const mockResponse: SiteMap = {
         urls: ['https://supadata.ai', 'https://supadata.ai/docs'],
@@ -856,6 +882,30 @@ describe('Supadata SDK', () => {
           }),
         })
       );
+    });
+
+    it('should normalise a flat completed job response into result', async () => {
+      const jobId = '123e4567-e89b-12d3-a456-426614174009';
+      const apiResponse = {
+        status: 'completed',
+        content: [{ text: 'Hello', offset: 0, duration: 1000, lang: 'en' }],
+        lang: 'en',
+        availableLangs: ['en', 'es'],
+      };
+
+      fetchMock.mockResponseOnce(JSON.stringify(apiResponse), {
+        headers: { 'content-type': 'application/json' },
+      });
+
+      const result = await supadata.transcript.getJobStatus(jobId);
+
+      expect(result.status).toBe('completed');
+      expect(result.result).toEqual({
+        content: apiResponse.content,
+        lang: 'en',
+        availableLangs: ['en', 'es'],
+      });
+      expect((result as any).content).toBeUndefined();
     });
 
     it('should get job status when job is still active', async () => {

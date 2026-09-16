@@ -19,17 +19,18 @@ npm install @supadata/js
 
 ```typescript
 import {
-  Crawl,
   CrawlJob,
   ExtractJobResult,
   JobId,
   JobResult,
-  Map,
   Metadata,
   Scrape,
+  SiteMap,
   Supadata,
   Transcript,
   TranscriptOrJobId,
+  TranslatedTranscript,
+  VideoIds,
   YoutubeChannel,
   YoutubePlaylist,
   YoutubeVideo,
@@ -127,7 +128,7 @@ if (result.status === 'completed') {
 
 ```typescript
 // Translate YouTube transcript
-const translated: Transcript = await supadata.youtube.translate({
+const translated: TranslatedTranscript = await supadata.youtube.translate({
   videoId: 'dQw4w9WgXcQ',
   lang: 'es',
 });
@@ -216,8 +217,17 @@ const playlistSearch = await supadata.youtube.search({
 // Scrape web content
 const webContent: Scrape = await supadata.web.scrape('https://supadata.ai');
 
+// Scrape with options
+const webContentNoLinks: Scrape = await supadata.web.scrape(
+  'https://supadata.ai',
+  {
+    noLinks: true, // optional: strip markdown links, keep link text
+    lang: 'en', // optional: preferred content language (ISO 639-1)
+  }
+);
+
 // Map website URLs
-const siteMap: Map = await supadata.web.map('https://supadata.ai');
+const siteMap: SiteMap = await supadata.web.map('https://supadata.ai');
 
 // Crawl website
 const crawl: JobId = await supadata.web.crawl({
@@ -237,12 +247,12 @@ The SDK throws `SupadataError` for API-related errors. You can catch and handle 
 import { SupadataError } from '@supadata/js';
 
 try {
-  const transcript = await supadata.youtube.transcript({
-    videoId: 'INVALID_ID',
+  const transcript = await supadata.transcript({
+    url: 'https://www.youtube.com/watch?v=INVALID_ID',
   });
 } catch (e) {
   if (e instanceof SupadataError) {
-    console.error(e.error); // e.g., 'video-not-found'
+    console.error(e.error); // e.g., 'not-found' or 'transcript-unavailable'
     console.error(e.message); // Human readable error message
     console.error(e.details); // Detailed error description
     console.error(e.documentationUrl); // Link to error documentation (optional)

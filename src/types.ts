@@ -26,6 +26,13 @@ export interface Scrape {
   urls: string[];
 }
 
+export interface ScrapeOptions {
+  /** When true, removes markdown links from the content, leaving only the link text. */
+  noLinks?: boolean;
+  /** Preferred language for the scraped content (ISO 639-1 code). Sets the Accept-Language header. */
+  lang?: string;
+}
+
 export interface SiteMap {
   urls: string[];
 }

@@ -1,15 +1,25 @@
 import { BaseClient } from '../client.js';
-import { CrawlJob, CrawlRequest, JobId, Scrape, SiteMap } from '../types.js';
+import {
+  CrawlJob,
+  CrawlRequest,
+  JobId,
+  Scrape,
+  ScrapeOptions,
+  SiteMap,
+} from '../types.js';
 
 export class WebService extends BaseClient {
   /**
    * Extract content from any web page to Markdown format.
    *
    * @param url - URL of the webpage to scrape
+   * @param options - Optional scrape options
+   * @param options.noLinks - When true, removes markdown links from the content
+   * @param options.lang - Preferred language for the scraped content (ISO 639-1 code)
    * @returns A promise that resolves to the scraped content
    */
-  async scrape(url: string): Promise<Scrape> {
-    return this.fetch<Scrape>('/web/scrape', { url });
+  async scrape(url: string, options: ScrapeOptions = {}): Promise<Scrape> {
+    return this.fetch<Scrape>('/web/scrape', { url, ...options });
   }
 
   /**
