@@ -61,7 +61,8 @@ export class SupadataError extends Error {
     | 'not-found'
     | 'unauthorized'
     | 'upgrade-required'
-    | 'limit-exceeded';
+    | 'limit-exceeded'
+    | 'upstream-error';
   details: string;
   documentationUrl: string;
 
